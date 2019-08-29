@@ -1,0 +1,12 @@
+build
+node_modules
+dist/main.d.ts
+dist/mocha.d.ts
+dist/test.d.ts
+typedoc
+src
+build-library.sh
+tsconfig.json
+tslint.json
+webpack*
+.editorconfig

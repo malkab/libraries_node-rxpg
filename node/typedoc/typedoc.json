@@ -1,0 +1,18 @@
+{
+
+    "src": [
+        "../src/lib"
+    ],
+
+    "name": "Angular 8 Boilerplate",
+    "inlineSourceMap": true,
+    "includeDeclarations": true,
+    "ignoreCompilerErrors": true,
+    "mode": "file",
+    "excludeExternals": true,
+    "excludeNotExported": true,
+    "excludeProtected": true,
+    "excludePrivate": true,
+    "readme": "../src/README.md"
+    
+}

@@ -1,0 +1,29 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "baseUrl": "./",
+        "target": "es2015",
+        "module": "esnext",
+        "declaration": true,
+        "downlevelIteration": true,
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "noImplicitAny": true,
+        "noEmitOnError": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "typeRoots": [
+            "node_modules/@types"
+          ],
+          "lib": [
+            "es2018",
+            "dom"
+          ],
+    },
+    "include": [ "src" ],
+    "exclude": [ "node_modules", "src/*.ts" ]
+}
