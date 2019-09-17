@@ -2,7 +2,7 @@
   "name": "@malkab/rxpg",
   "version": "0.0.0",
   "description": "A RxJS PostgreSQL interface.",
-  "scope": "@malkab",  
+  "scope": "@malkab",
   "author": {
     "name": "Juan Pedro Perez Alcantara",
     "email": "jp.perez.alcantara@gmail.com",
@@ -10,7 +10,10 @@
   },
   "main": "dist/main.js",
   "types": "dist/lib/index.d.ts",
-  "keywords": [ "RxJS", "PostgreSQL" ],
+  "keywords": [
+    "RxJS",
+    "PostgreSQL"
+  ],
   "license": "UNLICENSED",
   "homepage": "https://github.com/owner/project#readme",
   "repository": {
@@ -28,7 +31,6 @@
     "start:test": "npm-run-all --parallel service:watch:test:server service:watch:build",
     "start:mocha": "npm-run-all --parallel service:watch:mocha:server service:watch:build",
     "start": "npm-run-all --parallel service:watch:main:server service:watch:build",
-    
     "builddocs:html": "cd typedoc ; ./html.sh ; cd ..",
     "builddocs:markdown": "cd typedoc ; ./markdown.sh ; cd ..",
     "builddocs": "npm run builddocs:html ; npm run builddocs:markdown"
@@ -40,6 +42,7 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.12.0",
+    "@types/pg": "^7.4.14",
     "chai": "^4.2.0",
     "clean-webpack-plugin": "^2.0.1",
     "mocha": "^6.0.2",
@@ -56,5 +59,9 @@
     "webpack-cli": "^3.3.0",
     "webpack-node-externals": "^1.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "pg": "^7.9.0",
+    "pg-native": "^3.0.0",
+    "rxjs": "^6.5.2"
+  }
 }
