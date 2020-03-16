@@ -9,7 +9,7 @@ console.log(`
 `);
 
 
-import { RxPg } from "./lib/index";
+import { RxPg } from "../../lib/index";
 
 const pg = new RxPg(
     "rxpg-postgis-dev",

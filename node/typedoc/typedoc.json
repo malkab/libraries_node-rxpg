@@ -4,7 +4,7 @@
         "../src/lib"
     ],
 
-    "name": "Angular 8 Boilerplate",
+    "name": "XXX",
     "inlineSourceMap": true,
     "includeDeclarations": true,
     "ignoreCompilerErrors": true,
@@ -13,6 +13,6 @@
     "excludeNotExported": true,
     "excludeProtected": true,
     "excludePrivate": true,
-    "readme": "../src/README.md"
+    "readme": "./markdown/MAINPAGE.md"
     
 }

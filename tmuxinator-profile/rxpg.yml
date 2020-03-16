@@ -1,7 +1,0 @@
-name: rxpg
-root: /Users/git/cell-platform/rxpg
-
-windows:
-        - docker-dev: cd docker ; sleep 0.5 ; clear
-        - docker-pg: cd docker ; sleep 0.5 ; clear
-        - docker: cd docker ; sleep 0.5 ; clear
