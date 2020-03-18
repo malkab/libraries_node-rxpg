@@ -2,7 +2,8 @@ name: rxpg
 root: /Users/git/malkab-rx/rxpg
 
 windows:
-  - docker-dev: cd docker ; sleep 0.5 ; clear
-  - docker-pg: cd docker ; sleep 0.5 ; clear
-  - docker-psql: cd docker ; sleep 0.5 ; clear
+  - docker-dev: cd docker-rxpg ; sleep 0.5 ; clear
+  - docker-psql: cd docker-rxpg ; sleep 0.5 ; clear
+  - docker-pg: cd docker-rxpg ; sleep 0.5 ; clear
+  
   
