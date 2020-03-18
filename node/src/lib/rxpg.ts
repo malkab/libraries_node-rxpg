@@ -62,10 +62,21 @@ export class RxPg {
      * 
      */
 
-    constructor(
-        host: string, port: number, user: string, pass: string, 
-        db: string, maxPoolSize: number
-    ) {
+    constructor({
+      host = "postgis",
+      port = 5432,
+      user = "postgres",
+      pass = "postgres",
+      db = "postgres",
+      maxPoolSize = 10
+    }: {
+      host?: string;
+      port?: number;
+      user?: string;
+      pass?: string;
+      db?: string;
+      maxPoolSize: number;
+    }) {
 
         this._host = host;
         this._port = port;
