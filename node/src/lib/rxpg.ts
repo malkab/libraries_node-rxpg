@@ -2,6 +2,10 @@ import * as rx from "rxjs";
 
 import { PoolConfig, Pool, QueryResult } from "pg";
 
+import * as fs from "fs";
+
+
+
 
 
 /**
@@ -93,6 +97,22 @@ export class RxPg {
             this.redisError$.error(error);
 
         });
+
+    }
+
+
+
+    /**
+     * 
+     * Executes a script file.
+     * 
+     */
+
+    public executeScript$(file: string): rx.Observable<QueryResult> {
+
+      const script = fs.readFileSync(file).toString();
+
+      return this.executeQuery$(script);
 
     }
 
