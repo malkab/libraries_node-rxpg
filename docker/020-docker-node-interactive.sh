@@ -12,7 +12,7 @@
 # -----------------------------------------------------------------
 
 # Node image version
-NODE_VERSION=v10.16.0
+NODE_VERSION=12.16.3
 # Null for an interactive shell session
 SCRIPT=
 # The network to connect to. Remember that when attaching to the network
