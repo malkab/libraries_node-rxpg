@@ -1,0 +1,79 @@
+name: rxpg
+root: /home/git/malkab-rx/rxpg
+
+windows:
+  - dev: cd docker ; . mlkcontext common ; sleep 2 ; clear ; ./020_docker_node_interactive.sh
+
+  - psql: >
+      cd docker ;
+      . mlkcontext common ;
+      sleep 10 ;
+      clear ;
+      ./030_docker_postgis_psql.sh
+
+  - clients-8:
+      layout: even-vertical
+      panes:
+        - client-0: >
+            cd docker ;
+            . mlkcontext common ;
+            sleep 20 ;
+            clear ;
+            ./030_docker_postgis_psql.sh
+
+        - client-1: >
+            cd docker ;
+            . mlkcontext common ;
+            sleep 20 ;
+            clear ;
+            ./030_docker_postgis_psql.sh
+
+        - client-2: >
+            cd docker ;
+            . mlkcontext common ;
+            sleep 20 ;
+            clear ;
+            ./030_docker_postgis_psql.sh
+
+        - client-3: >
+            cd docker ;
+            . mlkcontext common ;
+            sleep 20 ;
+            clear ;
+            ./030_docker_postgis_psql.sh
+
+        - client-4: >
+            cd docker ;
+            . mlkcontext common ;
+            sleep 20 ;
+            clear ;
+            ./030_docker_postgis_psql.sh
+
+        - client-5: >
+            cd docker ;
+            . mlkcontext common ;
+            sleep 20 ;
+            clear ;
+            ./030_docker_postgis_psql.sh
+
+        - client-6: >
+            cd docker ;
+            . mlkcontext common ;
+            sleep 20 ;
+            clear ;
+            ./030_docker_postgis_psql.sh
+
+        - client-7: >
+            cd docker ;
+            . mlkcontext common ;
+            sleep 20 ;
+            clear ;
+            ./030_docker_postgis_psql.sh
+
+  - pg: >
+        cd docker ;
+        . mlkcontext common ;
+        sleep 0.5 ;
+        clear ;
+        ./005_docker_network_create.sh ;
+        ./010_docker_postgis_run.sh

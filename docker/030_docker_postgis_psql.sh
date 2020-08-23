@@ -1,33 +1,39 @@
 #!/bin/bash
 
+# Version 2020-08-07
+
 # -----------------------------------------------------------------
 #
-# psql session into the testing PostGIS.
+# psql client.
 #
 # -----------------------------------------------------------------
 #
 # Creates a volatile PostGIS container to either create an interactive
 # psql session or run a SQL script with the same client.
-#  
+#
 # -----------------------------------------------------------------
 
+# Check mlkcontext to check. If void, no check will be performed
+MATCH_MLKCONTEXT=common
 # The network to connect to. Remember that when attaching to the network
 # of an existing container (using container:name) the HOST is
 # "localhost"
-NETWORK=container:rxpg-postgis-dev
-# Null for an interactive psql session, use -f for launching files or -c
-# for commands. Files must be relative to the mount point SRC_FOLDER
+NETWORK=$MLKC_POSTGIS_NETWORK_NAME
+# These two options are mutually excluyent. Use null at both for
+# an interactive psql session. In case of passing a script, files
+# must exist at a mounted volume at the VOLUMES section.
 SCRIPT=
+COMMAND=
 # Container name
-CONTAINER_NAME=rxpg-testing-psql
+CONTAINER_NAME=
 # Container host name
 CONTAINER_HOST_NAME=
 # Work dir
-WORKDIR=/ext-src/
+WORKDIR=/ext_src/
 # The version of Docker PG image to use
-POSTGIS_DOCKER_TAG=feral_fennec
+POSTGIS_DOCKER_TAG=gargantuan_giraffe
 # The host
-HOST=localhost
+HOST=$MLKC_POSTGIS_CONTAINER_NAME
 # The port
 PORT=5432
 # The user
@@ -37,12 +43,14 @@ PASS=postgres
 # The DB
 DB=postgres
 # Declare volumes, a line per volume, complete in source:destination
-# form. No strings needed, $(pwd)/../data/:/ext-src/ works perfectly
+# form. No strings needed, $(pwd)/../data/:/ext_src/ works perfectly
 VOLUMES=(
-
-  $(pwd):/ext-src/
-    
+  $(pwd):/ext_src/
 )
+# Output to files. This will run the script silently and
+# output results and errors to out.txt and error.txt. Use only
+# if running a script or command (-f -c SCRIPT parameter).
+OUTPUT_FILES=false
 
 
 
@@ -50,22 +58,32 @@ VOLUMES=(
 
 # ---
 
-if [ ! -z "${NETWORK}" ] ; then NETWORK="--network=${NETWORK}" ; fi
+# Check mlkcontext
+if [ ! -z "${MATCH_MLKCONTEXT}" ] ; then
 
+  if [ ! "$(mlkcontext)" = "$MATCH_MLKCONTEXT" ] ; then
 
-if [ ! -z "${CONTAINER_NAME}" ] ; then 
+    echo Please initialise context $MATCH_MLKCONTEXT
 
-  CONTAINER_NAME="--name=${CONTAINER_NAME}"
-  
+    exit 1
+
+  fi
+
 fi
 
+if [ ! -z "${NETWORK}" ] ; then NETWORK="--network=${NETWORK}" ; fi
+
+if [ ! -z "${CONTAINER_NAME}" ] ; then
+
+  CONTAINER_NAME="--name=${CONTAINER_NAME}"
+
+fi
 
 if [ ! -z "${CONTAINER_HOST_NAME}" ] ; then
 
   CONTAINER_HOST_NAME="--hostname=${CONTAINER_HOST_NAME}"
-  
-fi
 
+fi
 
 VOLUMES_F=
 
@@ -79,20 +97,33 @@ if [ ! -z "${VOLUMES}" ] ; then
 
 fi
 
-
 if [ ! -z "${SCRIPT}" ] ; then
 
   SCRIPT="-f ${SCRIPT}"
-  
+
 fi
 
+if [ ! -z "${COMMAND}" ] ; then
 
-if [ ! -z "${WORKDIR}" ] ; then 
+  COMMAND="-c \\\"${COMMAND}\\\""
+
+fi
+
+if [ ! -z "${WORKDIR}" ] ; then
 
   WORKDIR="--workdir ${WORKDIR}"
 
 fi
 
+if [ "$OUTPUT_FILES" == "true" ] ; then
+
+  OUTPUT_FILES=" 1>out.txt 2>error.txt"
+
+else
+
+  OUTPUT_FILES=""
+
+fi
 
 eval    docker run -ti --rm \
           $NETWORK \
@@ -102,4 +133,4 @@ eval    docker run -ti --rm \
           $WORKDIR \
           --entrypoint /bin/bash \
           malkab/postgis:$POSTGIS_DOCKER_TAG \
-          -c "\"PGPASSWORD=${PASS} psql -h ${HOST} -p ${PORT} -U ${USER} ${DB} ${SCRIPT}\""
+          -c "\"PGPASSWORD=${PASS} psql -h ${HOST} -p ${PORT} -U ${USER} ${DB} ${SCRIPT} ${COMMAND} ${OUTPUT_FILES}\""
