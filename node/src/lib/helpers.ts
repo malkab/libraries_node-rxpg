@@ -64,7 +64,7 @@ export function toSqlArray(array: any[], type: string): string {
 
   })
 
-  return `${trimEnd(a, ",")}]::${type}`;
+  return `${trimEnd(a, ",")}]::${type}[]`;
 
 }
 
