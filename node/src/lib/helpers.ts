@@ -1,3 +1,5 @@
+import { trimEnd } from "lodash";
+
 /**
  *
  * This module contains a set of helpers that are commonly used in
@@ -28,6 +30,41 @@ export function inOperatorString(...items: string[]): string {
   })
 
   return `(${items.join(",")})`;
+
+}
+
+/**
+ *
+ * Returns an array compatible syntax for transforming JS arrays into SQL
+ * arrays:
+ *
+ * [ 1, 2, 3, 4 ]    > array[1,2,3,4]::integer[]
+ *
+ * [ 'a', 'b', 'c' ] > array['a', 'b', 'c']::varchar[]
+ *
+ * @param array     The array to transform.
+ * @param type      The type of the array. If varchar, items will be quoted.
+ *
+ */
+export function toSqlArray(array: any[], type: string): string {
+
+  let a: string = "array[";
+
+  array.map((x: any) => {
+
+    if (type === "varchar") {
+
+      a = `${a}'${x}',`;
+
+    } else {
+
+      a = `${a}${x},`;
+
+    }
+
+  })
+
+  return `${trimEnd(a, ",")}]::${type}`;
 
 }
 
