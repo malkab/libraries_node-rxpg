@@ -1,6 +1,6 @@
 {
 
-    "src": [
+    "inputFiles": [
         "../src/lib"
     ],
 
@@ -14,5 +14,5 @@
     "excludeProtected": true,
     "excludePrivate": true,
     "readme": "./markdown/MAINPAGE.md"
-    
+
 }
