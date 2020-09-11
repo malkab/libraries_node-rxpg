@@ -1,6 +1,6 @@
 import "mocha";
 
-import { helpers as h } from "../../lib/index";
+import { helpers as h } from "../../utils/index";
 
 import { expect } from "chai";
 

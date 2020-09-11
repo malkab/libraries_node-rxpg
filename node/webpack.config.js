@@ -1,11 +1,17 @@
 const path = require('path');
 const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
+const shebangCommand = require("shebang-command");
+
+// shebang ignore
+shebangCommand('#!/usr/bin/env node');
+shebangCommand('#!/bin/bash');
 
 module.exports = {
   entry: {
     mocha: "./src/test/main.test.ts",
     quicktest: "./src/test/00-quick-test.ts",
-    index: "./src/lib/index.ts"
+    core: "./src/core/index.ts",
+    utils: "./src/utils/index.ts"
   },
   mode: "development",
   watch: true,
@@ -27,10 +33,18 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.js$/,
+        loaders: [ "shebang-loader" ],
+        exclude: /node_modules/
+      },
+      {
         test: /\.tsx?$/,
         use: [
           {
-            loader: 'ts-loader',
+            loader: "shebang-loader"
+          },
+          {
+            loader: "ts-loader",
             options: {
               transpileOnly: true,
               experimentalWatchApi: true

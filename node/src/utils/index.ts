@@ -1,7 +1,5 @@
-export * from "./rxpg";
-
 export * from "./helpers";
 
-export { QueryResult } from "pg";
+export * from "./pgpersistence";
 
 export * from "./epgerrorcodes";
