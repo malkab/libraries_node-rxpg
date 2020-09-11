@@ -10,5 +10,4 @@
 #
 # ---------------------------
 
-export MLKC_POSTGIS_NETWORK_NAME=rxpg_postgis_dev
-export MLKC_POSTGIS_CONTAINER_NAME=rxpg_postgis_dev
+export MLKC_RXPG_APP_NAME=rxpg

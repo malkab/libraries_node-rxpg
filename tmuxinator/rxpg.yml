@@ -2,6 +2,21 @@ name: rxpg
 root: /home/git/malkab-libraries-node/rxpg
 
 windows:
-  - docker-dev: cd docker ; . mlkcontext common ; sleep 0.5 ; clear
-  - docker-psql: cd docker ; . mlkcontext common ; sleep 0.5 ; clear
-  - docker-pg: cd docker ; . mlkcontext common ; sleep 0.5 ; clear
+  - docker-dev: >
+      cd docker ;
+      . mlkcontext common ;
+      sleep 5 ;
+      clear ;
+      ./020_docker_node_interactive.sh
+  - docker-psql: >
+      cd docker ;
+      . mlkcontext common ;
+      sleep 5 ;
+      clear ;
+      ./030_docker_postgis_psql.sh
+  - docker-pg: >
+      cd docker ;
+      . mlkcontext common ;
+      sleep 0.5 ;
+      clear ;
+      ./010_compose_up.sh

@@ -18,7 +18,7 @@ MATCH_MLKCONTEXT=common
 # The network to connect to. Remember that when attaching to the network
 # of an existing container (using container:name) the HOST is
 # "localhost"
-NETWORK=$MLKC_POSTGIS_NETWORK_NAME
+NETWORK=rxpg-dev
 # These two options are mutually excluyent. Use null at both for
 # an interactive psql session. In case of passing a script, files
 # must exist at a mounted volume at the VOLUMES section.
@@ -33,7 +33,7 @@ WORKDIR=/ext_src/
 # The version of Docker PG image to use
 POSTGIS_DOCKER_TAG=gargantuan_giraffe
 # The host
-HOST=$MLKC_POSTGIS_CONTAINER_NAME
+HOST=postgis
 # The port
 PORT=5432
 # The user
