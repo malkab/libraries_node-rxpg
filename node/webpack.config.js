@@ -1,10 +1,5 @@
 const path = require('path');
 const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
-const shebangCommand = require("shebang-command");
-
-// shebang ignore
-shebangCommand('#!/usr/bin/env node');
-shebangCommand('#!/bin/bash');
 
 module.exports = {
   entry: {
@@ -33,16 +28,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        loaders: [ "shebang-loader" ],
-        exclude: /node_modules/
-      },
-      {
         test: /\.tsx?$/,
         use: [
-          {
-            loader: "shebang-loader"
-          },
           {
             loader: "ts-loader",
             options: {

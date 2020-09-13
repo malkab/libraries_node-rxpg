@@ -4,7 +4,7 @@ import * as rx from "rxjs";
 
 import * as rxo from "rxjs/operators";
 
-import { EPGERRORCODES } from "./epgerrorcodes";
+import { EPGERRORCODES } from "../core/epgerrorcodes";
 
 /**
  *
@@ -66,7 +66,7 @@ import { EPGERRORCODES } from "./epgerrorcodes";
  * module or how to go in a completely custom way.
  *
  */
-export interface IPgPersistence<T> {
+export interface IPgOrm<T> {
   /**
    *
    * Each class needs to implement a POST method that takes the object (this)
@@ -102,7 +102,7 @@ export interface IPgPersistence<T> {
  * **pgUpdate$** / **pgDelete$** functions.
  *
  */
-interface IDefaultPgPersistenceFunctionsDefinitions {
+interface IDefaultPgOrmFunctionsDefinitions {
   /**
    *
    * If true, will map PG errors to API errors, for an automatic integration
@@ -163,9 +163,9 @@ interface IDefaultPgPersistenceFunctionsDefinitions {
  *                      constructor.
  * @param config        The configuration of the SQL and parameters.
  */
-export function generateDefaultPgPersistenceFunctions(
+export function generateDefaultPgOrmFunctions(
   object: any,
-  config: IDefaultPgPersistenceFunctionsDefinitions
+  config: IDefaultPgOrmFunctionsDefinitions
 ): void {
 
   Object.keys(config).map((x: any) => {
