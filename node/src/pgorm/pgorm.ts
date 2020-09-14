@@ -215,7 +215,7 @@ export interface IPgOrm<T> {
    * by the ORM router constructors like the one at Appian.
    *
    */
-  pgInsert$: ({ pg }: { pg: RxPg }) => rx.Observable<T>;
+  pgInsert$: (pg: RxPg) => rx.Observable<T>;
   /**
    *
    * Each class needs to implement a PATCH method that takes the object (this)
@@ -224,7 +224,7 @@ export interface IPgOrm<T> {
    * and control result in an standard way.
    *
    */
-  pgUpdate$: ({ pg }: { pg: RxPg }) => rx.Observable<T>;
+  pgUpdate$: (pg: RxPg) => rx.Observable<T>;
   /**
    *
    * Each class needs to implement a DELETE method that takes the object (this)
@@ -233,7 +233,7 @@ export interface IPgOrm<T> {
    * and control result in an standard way.
    *
    */
-  pgDelete$: ({ pg }: { pg: RxPg }) => rx.Observable<T>;
+  pgDelete$: (pg: RxPg) => rx.Observable<T>;
 }
 
 /**
@@ -323,7 +323,7 @@ export function generateDefaultPgOrmMethods(
       returns?: (result: QueryResult) => any
     } = (<any>config.methods)[x];
 
-    object[x] = ({ pg }: { pg: RxPg }): rx.Observable<any> => {
+    object[x] = (pg: RxPg): rx.Observable<any> => {
 
       return executeParamQuery$({
         pg: pg,

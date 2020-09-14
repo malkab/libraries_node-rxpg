@@ -20,15 +20,15 @@ const pg: RxPg = new RxPg({
   host: "postgis"
 })
 
-const o: OrmTestSingleKey = new OrmTestSingleKey({ a: 55, b: "t", c: 78 });
+const o: OrmTestSingleKey = new OrmTestSingleKey({ a: 535, b: "t", c: 78 });
 
 rx.concat(
-  o.pgInsert$({ pg: pg }),
+  o.pgInsert$(pg),
   o.patch$({ b: "yu", c: 17 }),
-  o.pgUpdate$({ pg: pg }),
-  OrmTestSingleKey.get$({ pg: pg, id: 55 }),
+  o.pgUpdate$(pg),
+  OrmTestSingleKey.get$(pg, 55),
   OrmTestSingleKey.getList$(pg),
-  o.pgDelete$({ pg: pg })
+  o.pgDelete$(pg)
 ).subscribe(
 
   (n: any) => console.log("D: n", n),
