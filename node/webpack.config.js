@@ -6,7 +6,8 @@ module.exports = {
     mocha: "./src/test/main.test.ts",
     quicktest: "./src/test/00-quick-test.ts",
     core: "./src/core/index.ts",
-    utils: "./src/utils/index.ts"
+    utils: "./src/utils/index.ts",
+    pgorm: "./src/pgorm/index.ts"
   },
   mode: "development",
   watch: true,

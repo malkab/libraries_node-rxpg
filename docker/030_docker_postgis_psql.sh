@@ -18,7 +18,7 @@ MATCH_MLKCONTEXT=common
 # The network to connect to. Remember that when attaching to the network
 # of an existing container (using container:name) the HOST is
 # "localhost"
-NETWORK=rxpg-dev
+NETWORK=$MLKC_RXPG_APP_NAME
 # These two options are mutually excluyent. Use null at both for
 # an interactive psql session. In case of passing a script, files
 # must exist at a mounted volume at the VOLUMES section.
@@ -45,7 +45,7 @@ DB=postgres
 # Declare volumes, a line per volume, complete in source:destination
 # form. No strings needed, $(pwd)/../data/:/ext_src/ works perfectly
 VOLUMES=(
-  $(pwd):/ext_src/
+  $(pwd)/../node/src/test/:/ext_src/
 )
 # Output to files. This will run the script silently and
 # output results and errors to out.txt and error.txt. Use only

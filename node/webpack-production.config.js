@@ -4,9 +4,11 @@ const nodeExternals = require("webpack-node-externals");
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-  
-  entry: './src/lib/index.ts',
-
+  entry: {
+    core: "./src/core/index.ts",
+    utils: "./src/utils/index.ts",
+    pgorm: "./src/pgorm/index.ts"
+  },
   mode: "production",
   target: "node",
   plugins: [
@@ -33,7 +35,7 @@ module.exports = {
 
         path.join(__dirname, '/node_modules/'),
         path.join(__dirname, "/src/test/")
-  
+
       ]
     }]
   },

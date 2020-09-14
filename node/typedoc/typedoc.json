@@ -1,10 +1,11 @@
 {
 
     "inputFiles": [
-        "../src/lib"
+        "../src/core",
+        "../src/pgorm",
+        "../src/utils"
     ],
-
-    "name": "XXX",
+    "name": "RxPg",
     "inlineSourceMap": true,
     "includeDeclarations": true,
     "ignoreCompilerErrors": true,

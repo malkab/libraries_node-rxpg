@@ -3,7 +3,7 @@ version: '3.5'
 networks:
   rxpg-dev:
     external: false
-    name: rxpg-dev
+    name: ${MLKC_RXPG_APP_NAME}
 
 services:
   postgis:

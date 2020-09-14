@@ -27,7 +27,7 @@ NODE_MEMORY=2GB
 EXEC=
 # The network to connect to. Remember that when attaching to the network of an
 # existing container (using container:name) the HOST is "localhost".
-NETWORK=$MLKC_POSTGIS_NETWORK_NAME
+NETWORK=$MLKC_RXPG_APP_NAME
 # Jupyter mode: runs a Jupyter server with Javascript support if a version with
 # this capability is used. Jupyter exports automatically the 8888 port.
 JUPYTER=false
