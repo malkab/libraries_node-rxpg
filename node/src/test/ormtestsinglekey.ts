@@ -28,8 +28,8 @@ export class OrmTestSingleKey implements IPgOrm<OrmTestSingleKey> {
 
   // Placeholder for the required functions at the IPgPersistence interface
   // These will be created automatically by a helper at construction time
-  public pgInsert$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
-  public pgUpdate$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
+  public pgInsert$: ({ pg }: { pg: RxPg }) => rx.Observable<OrmTestSingleKey>;
+  public pgUpdate$: ({ pg }: { pg: RxPg }) => rx.Observable<OrmTestSingleKey>;
 
   /**
    *
@@ -121,7 +121,7 @@ export class OrmTestSingleKey implements IPgOrm<OrmTestSingleKey> {
    * PgOrm to make implement standard errors handling and such.
    *
    */
-  public pgDelete$(pg: RxPg): rx.Observable<OrmTestSingleKey> {
+  public pgDelete$({ pg }: { pg: RxPg }): rx.Observable<OrmTestSingleKey> {
 
     // Here goes a super complex deletion logic
     return executeParamQuery$({
@@ -154,8 +154,14 @@ export class OrmTestSingleKey implements IPgOrm<OrmTestSingleKey> {
    * Keep in mind that the names of columns must match the constructor of the
    * object, use AS for mapping.
    *
+   * The parameters for this method must be deconstructed so it allows for
+   * anonymous usage by the ORM router of Appian, for example.
+   *
    */
-  public static get$(pg: RxPg, id: number): rx.Observable<OrmTestSingleKey> {
+  public static get$(
+    { pg, id }:
+    { pg: RxPg, id: number }
+  ): rx.Observable<OrmTestSingleKey> {
 
     return select$<OrmTestSingleKey>({
       pg: pg,

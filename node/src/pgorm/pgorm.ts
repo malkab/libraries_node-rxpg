@@ -211,8 +211,11 @@ export interface IPgOrm<T> {
    * use the post$ helper method provided by PgRestObject to launch the INSERT
    * and control result in an standard way.
    *
+   * This method must have deconstructed params so it can be called with anonymous params
+   * by the ORM router constructors like the one at Appian.
+   *
    */
-  pgInsert$: (pg: RxPg) => rx.Observable<T>;
+  pgInsert$: ({ pg }: { pg: RxPg }) => rx.Observable<T>;
   /**
    *
    * Each class needs to implement a PATCH method that takes the object (this)
@@ -221,7 +224,7 @@ export interface IPgOrm<T> {
    * and control result in an standard way.
    *
    */
-  pgUpdate$: (pg: RxPg) => rx.Observable<T>;
+  pgUpdate$: ({ pg }: { pg: RxPg }) => rx.Observable<T>;
   /**
    *
    * Each class needs to implement a DELETE method that takes the object (this)
@@ -230,7 +233,7 @@ export interface IPgOrm<T> {
    * and control result in an standard way.
    *
    */
-  pgDelete$: (pg: RxPg) => rx.Observable<T>;
+  pgDelete$: ({ pg }: { pg: RxPg }) => rx.Observable<T>;
 }
 
 /**
@@ -320,7 +323,7 @@ export function generateDefaultPgOrmMethods(
       returns?: (result: QueryResult) => any
     } = (<any>config.methods)[x];
 
-    object[x] = (pg: RxPg): rx.Observable<any> => {
+    object[x] = ({ pg }: { pg: RxPg }): rx.Observable<any> => {
 
       return executeParamQuery$({
         pg: pg,
