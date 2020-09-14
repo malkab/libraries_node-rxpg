@@ -9,3 +9,7 @@ Quick Test
 ---------------------------
 
 `);
+
+import { RxPg } from "@malkab/rxpg";
+
+const a: RxPg = new RxPg({ host: "postgis" });

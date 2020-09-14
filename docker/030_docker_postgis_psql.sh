@@ -45,7 +45,7 @@ DB=postgres
 # Declare volumes, a line per volume, complete in source:destination
 # form. No strings needed, $(pwd)/../data/:/ext_src/ works perfectly
 VOLUMES=(
-  $(pwd)/../node/src/test/:/ext_src/
+  $(pwd)/../node/:/ext_src/
 )
 # Output to files. This will run the script silently and
 # output results and errors to out.txt and error.txt. Use only

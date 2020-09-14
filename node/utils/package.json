@@ -1,6 +1,6 @@
 {
   "name": "@malkab/rxpg-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A RxJS PostgreSQL interface.",
   "scope": "@malkab",
   "author": {
@@ -8,7 +8,7 @@
     "email": "jp.perez.alcantara@gmail.com",
     "url": "http://me.com"
   },
-  "main": "dist/main.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "keywords": [
     "RxJS",

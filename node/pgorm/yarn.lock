@@ -23,10 +23,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@malkab/rxpg@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@malkab/rxpg/-/rxpg-3.0.0.tgz#d1691113b7153aa928da6ac520dd5179679f3624"
-  integrity sha512-kCmrD/C6wCZ6CrRiK/7f1EaJEBkf6CExBtw6Z+HOe2OoKBrGzEgv96TllwN8bfsCIJfJc+8NgJy6lSvFwsW0zg==
+"@malkab/rxpg@^3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@malkab/rxpg/-/rxpg-3.0.3.tgz#390a08766df9c70febce020b9e03b967dc2ffb11"
+  integrity sha512-F33fouoa83J7T1gNsa3VgNP8uZ23dbytCtnDzIgD/gxbPMmq/SpMbOD8BACpLn2n2ocikaayHPOiVjDl9HNvUg==
   dependencies:
     pg "^8.3.3"
     pg-native "^3.0.0"

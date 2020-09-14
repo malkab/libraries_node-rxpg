@@ -8,7 +8,7 @@
     "email": "jp.perez.alcantara@gmail.com",
     "url": "http://me.com"
   },
-  "main": "dist/main.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "keywords": [
     "RxJS",
@@ -59,7 +59,7 @@
     "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
-    "@malkab/rxpg": "^3.0.0",
+    "@malkab/rxpg": "^3.0.3",
     "rxjs": "^6.6.2"
   }
 }

@@ -11,5 +11,5 @@ tsconfig.json
 tslint.json
 webpack*
 .editorconfig
-README-package-json.md
+README.boilerplate.md
 *.tgz
