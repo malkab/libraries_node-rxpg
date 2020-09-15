@@ -5,13 +5,13 @@ windows:
   - docker-dev: >
       cd docker ;
       . mlkcontext common ;
-      sleep 5 ;
+      sleep 10 ;
       clear ;
       ./020_docker_node_interactive.sh
   - docker-psql: >
       cd docker ;
       . mlkcontext common ;
-      sleep 5 ;
+      sleep 10 ;
       clear ;
       ./030_docker_postgis_psql.sh
   - docker-pg: >
