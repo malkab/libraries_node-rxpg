@@ -356,10 +356,15 @@ export function generateDefaultPgOrmMethods(
             }
 
             // Default throw
-            throw e;
+            throw new OrmError({
+              code: EORMERRORCODES.UNSPECIFIED_DB_ERROR,
+              error: new Error("unspecified db error"),
+              message: "unspecified db error"
+            })
 
           } else {
 
+            // Throw original error, do not map to OrmError
             throw e;
 
           }
@@ -451,14 +456,38 @@ export function select$<T>({
     params()
   ).pipe(
 
+    rxo.catchError((e: any) => {
+
+      // User provided wrong select parameters
+      if (e.code === EPGERRORCODES.invalid_text_representation) {
+
+        throw new OrmError({
+          code: EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+          error: new Error("invalid object parameters"),
+          message: "invalid object parameters"
+        })
+
+      }
+
+      // Throw any other error
+      throw new OrmError({
+        code: EORMERRORCODES.UNSPECIFIED_DB_ERROR,
+        error: new Error("unspecified db error"),
+        message: "unspecified db error"
+      })
+
+    }),
+
     rxo.map((o: QueryResult) => {
 
       if (o.rows.length === 0) {
+
         throw new OrmError({
           code: EORMERRORCODES.NOT_FOUND,
           error: new Error("not found"),
           message: "not found"
         })
+
       }
 
       return <T>(new type(o.rows[0]));
@@ -503,6 +532,28 @@ export function selectMany$<T>({
     params()
   )
   .pipe(
+
+    rxo.catchError((e: any) => {
+
+      // User provided wrong select parameters
+      if (e.code === EPGERRORCODES.invalid_text_representation) {
+
+        throw new OrmError({
+          code: EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+          error: new Error("invalid object parameters"),
+          message: "invalid object parameters"
+        })
+
+      }
+
+      // Throw any other error
+      throw new OrmError({
+        code: EORMERRORCODES.UNSPECIFIED_DB_ERROR,
+        error: new Error("unspecified db error"),
+        message: "unspecified db error"
+      })
+
+    }),
 
     rxo.map((o: QueryResult) => {
 

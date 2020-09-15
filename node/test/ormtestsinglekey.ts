@@ -174,12 +174,12 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
    * This is an example of a list retrieving static method.
    *
    */
-  public static getList$(pg: RxPg): rx.Observable<OrmTestSingleKey[]> {
+  public static getList$(pg: RxPg, id: number): rx.Observable<OrmTestSingleKey[]> {
 
     return PgOrm.selectMany$({
       pg: pg,
-      params: () => null,
-      sql: "select * from singlekeyobjects",
+      params: () => [ id ],
+      sql: "select * from singlekeyobjects where a < $1;",
       type: OrmTestSingleKey
     })
 
