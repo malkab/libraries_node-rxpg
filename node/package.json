@@ -1,6 +1,6 @@
 {
   "name": "@malkab/rxpg",
-  "version": "3.0.4",
+  "version": "3.1.0",
   "description": "A RxJS PostgreSQL interface.",
   "scope": "@malkab",
   "author": {
@@ -26,8 +26,8 @@
     "quick-test": "npm-run-all --parallel service:watch:quick-test:server service:build",
     "start": "npm-run-all --parallel service:watch:mocha:server service:build",
     "build": "npm run clean ; npm run service:build-lib",
-    "build-with-docs": "npm run clean ; npm run service:build-lib ; npm run build-docs ; cp -R typedoc/build/html dist/docs",
-    "build-docs": "cd typedoc ; ./html.sh ; cd ..",
+    "build-with-docs": "npm run clean ; npm run service:build-lib ; npm run build-docs ; cp -R typedoc/build/html docs",
+    "build-docs": "cd typedoc ; ./html ; cd ..",
     "service:build-lib": "webpack --config webpack-production.config.js --progress --colors",
     "service:build": "webpack --progress --colors",
     "service:watch:quick-test:server": "nodemon --inspect=0.0.0.0:9329 \"./build/quicktest.js\" --watch \"./build/quicktest.js\"",
@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@types/chai": "^4.2.12",
+    "@types/lodash": "^4.14.161",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.6.2",
     "@types/pg": "^7.14.4",
@@ -58,6 +59,7 @@
     "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
+    "lodash": "^4.17.20",
     "pg": "^8.3.3",
     "pg-native": "^3.0.0",
     "rxjs": "^6.6.2"
