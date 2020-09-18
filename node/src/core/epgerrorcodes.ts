@@ -10,6 +10,7 @@ export enum EPGERRORCODES {
   "unique_violation" = "23505",
   "numeric_value_out_of_range" = "22003",
   "indeterminate_datatype" = "42P18",
-  "invalid_text_representation" = "22P02"
+  "invalid_text_representation" = "22P02",
+  "foreign_key_violation" = "23503"
 
 }

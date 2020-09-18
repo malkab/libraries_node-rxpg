@@ -344,6 +344,17 @@ export function generateDefaultPgOrmMethods(
 
             }
 
+            // Foreign key violations
+            if ((<any>e).code === EPGERRORCODES.foreign_key_violation) {
+
+              throw new OrmError({
+                code: EORMERRORCODES.FOREIGN_KEY_VIOLATION,
+                error: e,
+                message: 'foreign key violation'
+              })
+
+            }
+
             // Duplicated ID
             if ((<any>e).code === EPGERRORCODES.unique_violation) {
 

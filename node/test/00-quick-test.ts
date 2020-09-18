@@ -23,12 +23,12 @@ const pg: RxPg = new RxPg({
 const o: OrmTestSingleKey = new OrmTestSingleKey({ a: 535, b: "t", c: 78 });
 
 rx.concat(
-  // o.pgInsert$(pg),
-  // o.patch$({ b: "yu", c: 17 }),
+  o.pgInsert$(pg),
+  o.patch$({ b: "yu", c: 17 }),
   // o.pgUpdate$(pg),
-  // OrmTestSingleKey.get$(pg, 55),
-  OrmTestSingleKey.getList$(pg, 100),
-  // o.pgDelete$(pg)
+  OrmTestSingleKey.get$(pg, 535),
+  // OrmTestSingleKey.getList$(pg, 100),
+  o.pgDelete$(pg)
 ).subscribe(
 
   (n: any) => console.log("D: n", n),
