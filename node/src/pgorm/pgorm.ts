@@ -511,19 +511,26 @@ export function select$<T>({
 
 /**
  *
- * GET: for getting objects by ID. CRUD READ operation. Static to be called
- * without instantiating an object and creating factories.
+ * This helper function returns an array of the provided objects. This is used
+ * to retrieve a set of objects based on a parametrized SQL.
  *
- * Successfull code: 200 (OK).
- * Errors codes: 404 (Not Found) if object ID doesn't exists.
+ * @param __namedParameters
+ * Deconstructed parameters summary.
  *
- * @param pg                The persistence objects and/or parameters to
- *                          perform the CREATE option.
- * @param type              The type to create instances from the returned DB
- *                          rows.
- * @param sql               The SQL to pass to RxPg.executeParamQuery.
- * @param params            The params to use with the given SQL.
- * @returns                 An array of objects of class "type".
+ * @param pg
+ * The RxPg object governing the connection pool to launch the SQL against.
+ *
+ * @param type
+ * The type to create instances from the returned DB rows.
+ *
+ * @param sql
+ * The parametrized SQL to pass to RxPg.executeParamQuery.
+ *
+ * @param params
+ * The params to use with the given SQL.
+ *
+ * @returns
+ * An Observable with an array of objects of class "type".
  *
  */
 export function selectMany$<T>({
