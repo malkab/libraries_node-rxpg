@@ -211,7 +211,7 @@ export interface IPgOrm<T> {
    * by the ORM router constructors like the one at Appian.
    *
    */
-  pgInsert$: (pg: RxPg) => rx.Observable<T> | undefined;
+  pgInsert$: (pg: RxPg) => rx.Observable<T>;
   /**
    *
    * Each class needs to implement a PATCH method that takes the object (this)
@@ -220,7 +220,7 @@ export interface IPgOrm<T> {
    * and control result in an standard way.
    *
    */
-  pgUpdate$: (pg: RxPg) => rx.Observable<T> | undefined;
+  pgUpdate$: (pg: RxPg) => rx.Observable<T>;
   /**
    *
    * Each class needs to implement a DELETE method that takes the object (this)
@@ -229,7 +229,7 @@ export interface IPgOrm<T> {
    * and control result in an standard way.
    *
    */
-  pgDelete$: (pg: RxPg) => rx.Observable<T> | undefined;
+  pgDelete$: (pg: RxPg) => rx.Observable<T>;
 }
 
 /**
