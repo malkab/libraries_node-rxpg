@@ -26,7 +26,7 @@ export class RxPg {
   private _pool: Pool;
   private _maxPoolSize: number;
   private _minPoolSize: number;
-  private _applicationName: string;
+  private _applicationName: string | undefined;
   // number of milliseconds a client must sit idle in the pool and not be
   // checked out before it is disconnected from the backend and discarded
   // default is 10000 (10 seconds) - set to 0 to disable auto-disconnection of
@@ -75,7 +75,7 @@ export class RxPg {
     db="postgres",
     maxPoolSize=10,
     minPoolSize=3,
-    applicationName=null,
+    applicationName,
     idleTimeoutMillis=10000
   }: {
     host?: string;
@@ -96,7 +96,17 @@ export class RxPg {
     this._database = db;
     this._maxPoolSize = maxPoolSize;
     this._minPoolSize = minPoolSize;
-    this._applicationName = applicationName;
+
+    if (applicationName) {
+
+      this._applicationName = applicationName;
+
+    } else {
+
+      this._applicationName = undefined;
+
+    }
+
     this._idleTimeoutMillis = idleTimeoutMillis;
 
     this._pool = new Pool(this.poolConfig);
