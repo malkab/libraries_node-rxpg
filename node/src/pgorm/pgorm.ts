@@ -527,8 +527,6 @@ export function select$<T>({
 
       }
 
-      console.log("D: jh3234235", o.rows[0]);
-
       // Return object, initialized by the init
       return newFunction(
         { ...o.rows[0], select$params: { pg: pg, params: params() } })
