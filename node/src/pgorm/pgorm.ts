@@ -435,31 +435,57 @@ export function executeParamQuery$({
 
 /**
  *
- * GET: for getting objects by ID. CRUD READ operation. Static to be called
- * without instantiating an object and creating factories.
+ * Helper function to write the get$ methods for ORM objects, that usually are
+ * statics. This function returns a single instantiated object of class T, also
+ * defined by the object **type** passed as a param.
  *
- * Successfull code: 200 (OK).
- * Errors codes: 404 (Not Found) if object ID doesn't exists.
+ * @param pg
+ * The persistence objects and/or parameters to perform the CREATE option.
  *
- * @param pg                The persistence objects and/or parameters to
- *                          perform the CREATE option.
- * @param type              The type to create instances from the returned DB
- *                          rows.
- * @param sql               The SQL to pass to RxPg.executeParamQuery.
- * @param params            The params to use with the given SQL.
- * @returns                 An array of objects of class "type".
+ * @param sql
+ * The SQL to pass to RxPg.executeParamQuery.
+ *
+ * @param type
+ * The type to create instances from the returned DB rows.
+ *
+ * @param params
+ * The params to use with the given SQL, passed as a paramless function that
+ * must return an array of params in the right order.
+ *
+ * @param newFunction
+ * This function allows for a customized object T initialization workflow. By
+ * default, this method just calls the new constructor of the type with the
+ * parameters coming from the database, as designed in the provided SQL. The
+ * definition of this custom function allow for the definition of complex,
+ * potentially asynchronous tasks. This function has the prototype:
+ *
+ * ```TypeScript
+ * (params: any) => rx.Observable<T>
+ * ```
+ *
+ * Into this function are injected several parameters:
+ *
+ * - rows obtained from the SQL query;
+ * - an additional param by the name **select$params** that contains:
+ *   - the RxPg object used to connect to the DB;
+ *   - the params from the params function parameter.
+ *
+ * @returns
+ * An instantiated object of class "type" with values coming from the DB.
  *
  */
 export function select$<T>({
   pg,
   sql,
   type,
-  params
+  params,
+  newFunction = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
   params: () => any[];
+  newFunction?: (params: any) => rx.Observable<T>;
 }): rx.Observable<T> {
 
   return pg.executeParamQuery$(
@@ -489,7 +515,7 @@ export function select$<T>({
 
     }),
 
-    rxo.map((o: QueryResult) => {
+    rxo.concatMap((o: QueryResult) => {
 
       if (o.rows.length === 0) {
 
@@ -501,7 +527,11 @@ export function select$<T>({
 
       }
 
-      return <T>(new type(o.rows[0]));
+      console.log("D: jh3234235", o.rows[0]);
+
+      // Return object, initialized by the init
+      return newFunction(
+        { ...o.rows[0], select$params: { pg: pg, params: params() } })
 
     })
 
@@ -511,38 +541,57 @@ export function select$<T>({
 
 /**
  *
- * This helper function returns an array of the provided objects. This is used
- * to retrieve a set of objects based on a parametrized SQL.
- *
- * @param __namedParameters
- * Deconstructed parameters summary.
+ * Helper function to write the get$ methods for ORM objects, that usually are
+ * statics. This function returns an array of instantiated objects of class T,
+ * also defined by the object **type** passed as a param.
  *
  * @param pg
- * The RxPg object governing the connection pool to launch the SQL against.
+ * The persistence objects and/or parameters to perform the CREATE option.
+ *
+ * @param sql
+ * The SQL to pass to RxPg.executeParamQuery.
  *
  * @param type
  * The type to create instances from the returned DB rows.
  *
- * @param sql
- * The parametrized SQL to pass to RxPg.executeParamQuery.
- *
  * @param params
- * The params to use with the given SQL.
+ * The params to use with the given SQL, passed as a paramless function that
+ * must return an array of params in the right order.
+ *
+ * @param newFunction
+ * This function allows for a customized object T initialization workflow. By
+ * default, this method just calls the new constructor of the type with the
+ * parameters coming from the database, as designed in the provided SQL. The
+ * definition of this custom function allow for the definition of complex,
+ * potentially asynchronous tasks. This function has the prototype:
+ *
+ * ```TypeScript
+ * (params: any) => rx.Observable<T>
+ * ```
+ *
+ * Into this function are injected several parameters:
+ *
+ * - rows obtained from the SQL query;
+ * - an additional param by the name **select$params** that contains:
+ *   - the RxPg object used to connect to the DB;
+ *   - the params from the params function parameter.
  *
  * @returns
- * An Observable with an array of objects of class "type".
+ * An instantiated object of class "type" with values coming from the DB.
  *
  */
 export function selectMany$<T>({
   pg,
   sql,
   type,
-  params
+  params,
+  newFunction = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
   params: () => any[];
+  newFunction?: (params: any) => rx.Observable<T>;
 }): rx.Observable<T[]> {
 
   return pg.executeParamQuery$(
@@ -573,13 +622,18 @@ export function selectMany$<T>({
 
     }),
 
-    rxo.map((o: QueryResult) => {
+    rxo.concatMap((o: QueryResult) => {
 
-      return o.rows.map((r: any) => {
+      const obs: rx.Observable<T>[] =
+        o.rows.map((r: any) => newFunction({ ...r }));
 
-        return <T>(new type(r));
+      return rx.zip(...obs);
 
-      })
+    }),
+
+    rxo.map((o: any) => {
+
+      return o;
 
     })
 

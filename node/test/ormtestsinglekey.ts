@@ -74,11 +74,13 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
   constructor({
       a,
       b,
-      c
+      c,
+      additional
     }: {
       a: number;
       b: string;
       c: number;
+      additional?: number;
   }) {
 
     if (!isNumber(+a)) {
@@ -86,6 +88,8 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       throw new Error("a must be a number");
 
     }
+
+    console.log("COMPLEX INITIALIZATION LOGIC HERE", additional);
 
     this._a = +a;
 
@@ -157,14 +161,27 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
    * The parameters for this method must be deconstructed so it allows for
    * anonymous usage by the ORM router of Appian, for example.
    *
+   * This function uses an custom initializator function that injects additional
+   * params into the contructor.
+   *
    */
-  public static get$(pg: RxPg, id: number): rx.Observable<OrmTestSingleKey> {
+  public static get$(pg: RxPg, id: number, additional: number): rx.Observable<OrmTestSingleKey> {
 
     return PgOrm.select$<OrmTestSingleKey>({
       pg: pg,
-      sql: 'select a as a, b as b from singlekeyobjects where a=$1;',
+      sql: 'select a as a, b as b, c as c from singlekeyobjects where a=$1;',
       params: () => [ id ],
-      type: OrmTestSingleKey
+      type: OrmTestSingleKey,
+      /**
+       *
+       * This is an example of complex init function.
+       *
+       */
+      newFunction: (params: any) => {
+        console.log("D: params at newFunction", params);
+        console.log("PERFORMING COMPLEX ASYNCH INIT LOGIC HERE");
+        return rx.of(new OrmTestSingleKey({ ...params, additional: additional }));
+      }
     })
 
   }
@@ -174,13 +191,23 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
    * This is an example of a list retrieving static method.
    *
    */
-  public static getList$(pg: RxPg, id: number): rx.Observable<OrmTestSingleKey[]> {
+  public static getList$(pg: RxPg, id: number, additional: number): rx.Observable<OrmTestSingleKey[]> {
 
     return PgOrm.selectMany$({
       pg: pg,
-      params: () => [ id ],
-      sql: "select * from singlekeyobjects where a < $1;",
-      type: OrmTestSingleKey
+      // params: () => [ id ],
+      params: () => [],
+      sql: "select * from singlekeyobjects;",
+      type: OrmTestSingleKey,
+      /**
+       *
+       * This is an example of complex init function.
+       *
+       */
+      newFunction: (params: any) => {
+        console.log("PERFORMING COMPLEX ASYNCH INIT LOGIC HERE FOR MULTI");
+        return rx.of(new OrmTestSingleKey({ ...params, additional: params.a + params.b + additional }));
+      }
     })
 
   }
