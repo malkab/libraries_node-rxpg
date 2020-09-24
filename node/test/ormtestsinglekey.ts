@@ -6,8 +6,6 @@ import * as rx from "rxjs";
 
 import * as rxo from "rxjs/operators";
 
-import { isNumber } from "lodash";
-
 /**
  *
  * This is an example of a class that implements IPgOrm using all the helpers.
@@ -83,9 +81,15 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       additional?: number;
   }) {
 
-    if (!isNumber(+a)) {
+    if (isNaN(+a)) {
 
       throw new Error("a must be a number");
+
+    }
+
+    if (a > 10) {
+
+      throw new Error("a > 10");
 
     }
 
@@ -101,7 +105,7 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
     // from parametrized SQL and functions that returns the correct paramters
     // sequence in this object context
     PgOrm.generateDefaultPgOrmMethods(this, {
-      restApiErrorMapping: true,
+      restApiErrorMapping: false,
       methods: {
         pgInsert$: {
           sql: 'insert into singlekeyobjects values ($1, $2, $3);',
@@ -139,8 +143,6 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       rxo.map((o: any) => {
 
         console.log("D: this comes from the custom delete$ method");
-        console.log("D: ", o);
-
         return this;
 
       })
@@ -178,10 +180,13 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
        *
        */
       newFunction: (params: any) => {
+        // Errors can be launched here safely
+        // throw new Error("ERROR HERE");
         console.log("D: params at newFunction", params);
         console.log("PERFORMING COMPLEX ASYNCH INIT LOGIC HERE");
         return rx.of(new OrmTestSingleKey({ ...params, additional: additional }));
-      }
+      },
+      restApiErrorMapping: true
     })
 
   }
@@ -207,7 +212,8 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       newFunction: (params: any) => {
         console.log("PERFORMING COMPLEX ASYNCH INIT LOGIC HERE FOR MULTI");
         return rx.of(new OrmTestSingleKey({ ...params, additional: params.a + params.b + additional }));
-      }
+      },
+      restApiErrorMapping: true
     })
 
   }

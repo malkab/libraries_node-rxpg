@@ -10,6 +10,6 @@ Quick Test
 
 `);
 
-import { helpers } from "../../src/index";
+import { Helpers } from "../../src/index";
 
-console.log("D: jejje", helpers.toSqlArray([ 1, 2, 3], "varchar"));
+console.log("toSqlArray", Helpers.toSqlArray([ 1, 2, 3], "varchar"));

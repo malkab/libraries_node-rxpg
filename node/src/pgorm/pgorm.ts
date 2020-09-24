@@ -4,9 +4,9 @@ import * as rx from "rxjs";
 
 import * as rxo from "rxjs/operators";
 
-import { OrmError } from './ormerror';
+import { RestOrm } from '@malkab/appian';
 
-import { EORMERRORCODES } from './eormerrorcodes';
+
 
 /**
  *
@@ -26,6 +26,9 @@ import { EORMERRORCODES } from './eormerrorcodes';
  * class, apply the following guidelines.
  *
  * # Generic Guidelines
+ *
+ * select$, selectMany$ support errors thrown by the constructor and by
+ * newFunction custom initializators, so feel free to throw errors there.
  *
  * This class don't reference an internal RxPg instance. Instead of that, the
  * RxPg instance upon which to perform the persistence operation must be
@@ -336,8 +339,8 @@ export function generateDefaultPgOrmMethods(
             // Invalid parameters
             if ((<any>e).code === EPGERRORCODES.invalid_text_representation) {
 
-              throw new OrmError({
-                code: EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+              throw new RestOrm.OrmError({
+                code: RestOrm.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
                 error: e,
                 message: 'invalid object parameters'
               })
@@ -347,8 +350,8 @@ export function generateDefaultPgOrmMethods(
             // Foreign key violations
             if ((<any>e).code === EPGERRORCODES.foreign_key_violation) {
 
-              throw new OrmError({
-                code: EORMERRORCODES.FOREIGN_KEY_VIOLATION,
+              throw new RestOrm.OrmError({
+                code: RestOrm.EORMERRORCODES.FOREIGN_KEY_VIOLATION,
                 error: e,
                 message: 'foreign key violation'
               })
@@ -358,8 +361,8 @@ export function generateDefaultPgOrmMethods(
             // Duplicated ID
             if ((<any>e).code === EPGERRORCODES.unique_violation) {
 
-              throw new OrmError({
-                code: EORMERRORCODES.DUPLICATED,
+              throw new RestOrm.OrmError({
+                code: RestOrm.EORMERRORCODES.DUPLICATED,
                 error: e,
                 message: 'duplicated key'
               })
@@ -367,15 +370,15 @@ export function generateDefaultPgOrmMethods(
             }
 
             // Default throw
-            throw new OrmError({
-              code: EORMERRORCODES.UNSPECIFIED_DB_ERROR,
+            throw new RestOrm.OrmError({
+              code: RestOrm.EORMERRORCODES.UNSPECIFIED_DB_ERROR,
               error: new Error("unspecified db error"),
               message: "unspecified db error"
             })
 
           } else {
 
-            // Throw original error, do not map to OrmError
+            // Throw original error, do not map to RestOrm.OrmError
             throw e;
 
           }
@@ -479,12 +482,14 @@ export function select$<T>({
   sql,
   type,
   params,
+  restApiErrorMapping = true,
   newFunction = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
   params: () => any[];
+  restApiErrorMapping?: boolean;
   newFunction?: (params: any) => rx.Observable<T>;
 }): rx.Observable<T> {
 
@@ -495,23 +500,31 @@ export function select$<T>({
 
     rxo.catchError((e: any) => {
 
-      // User provided wrong select parameters
-      if (e.code === EPGERRORCODES.invalid_text_representation) {
+      if (restApiErrorMapping) {
 
-        throw new OrmError({
-          code: EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-          error: new Error("invalid object parameters"),
-          message: "invalid object parameters"
+        // User provided wrong select parameters
+        if (e.code === EPGERRORCODES.invalid_text_representation) {
+
+          throw new RestOrm.OrmError({
+            code: RestOrm.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+            error: new Error("invalid object parameters"),
+            message: "invalid object parameters"
+          })
+
+        }
+
+        // Throw any other error
+        throw new RestOrm.OrmError({
+          code: RestOrm.EORMERRORCODES.UNSPECIFIED_DB_ERROR,
+          error: new Error("unspecified db error"),
+          message: "unspecified db error"
         })
 
-      }
+      } else {
 
-      // Throw any other error
-      throw new OrmError({
-        code: EORMERRORCODES.UNSPECIFIED_DB_ERROR,
-        error: new Error("unspecified db error"),
-        message: "unspecified db error"
-      })
+        throw e;
+
+      }
 
     }),
 
@@ -519,17 +532,34 @@ export function select$<T>({
 
       if (o.rows.length === 0) {
 
-        throw new OrmError({
-          code: EORMERRORCODES.NOT_FOUND,
+        throw new RestOrm.OrmError({
+          code: RestOrm.EORMERRORCODES.NOT_FOUND,
           error: new Error("not found"),
           message: "not found"
         })
 
       }
 
-      // Return object, initialized by the init
       return newFunction(
         { ...o.rows[0], select$params: { pg: pg, params: params() } })
+
+    }),
+
+    rxo.catchError((e: any) => {
+
+      if (restApiErrorMapping) {
+
+        throw new RestOrm.OrmError({
+          code: RestOrm.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT,
+          error: e,
+          message: "error initializing object"
+        })
+
+      } else {
+
+        throw e;
+
+      }
 
     })
 
@@ -583,12 +613,14 @@ export function selectMany$<T>({
   sql,
   type,
   params,
+  restApiErrorMapping = true,
   newFunction = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
   params: () => any[];
+  restApiErrorMapping?: boolean;
   newFunction?: (params: any) => rx.Observable<T>;
 }): rx.Observable<T[]> {
 
@@ -600,23 +632,31 @@ export function selectMany$<T>({
 
     rxo.catchError((e: any) => {
 
-      // User provided wrong select parameters
-      if (e.code === EPGERRORCODES.invalid_text_representation) {
+      if (restApiErrorMapping) {
 
-        throw new OrmError({
-          code: EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-          error: new Error("invalid object parameters"),
-          message: "invalid object parameters"
+        // User provided wrong select parameters
+        if (e.code === EPGERRORCODES.invalid_text_representation) {
+
+          throw new RestOrm.OrmError({
+            code: RestOrm.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+            error: new Error("invalid object parameters"),
+            message: "invalid object parameters"
+          })
+
+        }
+
+        // Throw any other error
+        throw new RestOrm.OrmError({
+          code: RestOrm.EORMERRORCODES.UNSPECIFIED_DB_ERROR,
+          error: new Error("unspecified db error"),
+          message: "unspecified db error"
         })
 
-      }
+      } else {
 
-      // Throw any other error
-      throw new OrmError({
-        code: EORMERRORCODES.UNSPECIFIED_DB_ERROR,
-        error: new Error("unspecified db error"),
-        message: "unspecified db error"
-      })
+        throw e;
+
+      }
 
     }),
 
@@ -626,6 +666,24 @@ export function selectMany$<T>({
         o.rows.map((r: any) => newFunction({ ...r }));
 
       return rx.zip(...obs);
+
+    }),
+
+    rxo.catchError((e: any) => {
+
+      if (restApiErrorMapping) {
+
+        throw new RestOrm.OrmError({
+          code: RestOrm.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT,
+          error: e,
+          message: "error initializing object"
+        })
+
+      } else {
+
+        throw e;
+
+      }
 
     }),
 
