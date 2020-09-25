@@ -1,6 +1,6 @@
 {
   "name": "@malkab/rxpg",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "description": "A RxJS PostgreSQL interface.",
   "scope": "@malkab",
   "author": {
@@ -26,7 +26,7 @@
     "quick-test": "npm-run-all --parallel service:watch:quick-test:server service:build",
     "start": "npm-run-all --parallel service:watch:mocha:server service:build",
     "build": "npm run clean ; npm run service:build-lib",
-    "build-with-docs": "npm run clean ; npm run service:build-lib ; npm run build-docs ; rm -R docs ; cp -R typedoc/build/html docs",
+    "build-with-docs": "npm run clean ; npm run service:build-lib ; npm run build-docs ; rm -Rf docs ; cp -R typedoc/build/html docs",
     "build-docs": "cd typedoc ; ./html ; cd ..",
     "service:build-lib": "webpack --config webpack-production.config.js --progress --colors",
     "service:build": "webpack --progress --colors",
@@ -59,12 +59,10 @@
     "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
+    "@malkab/ts-utils": "^4.0.0",
     "lodash": "^4.17.20",
     "pg": "^8.3.3",
     "pg-native": "^3.0.0",
     "rxjs": "^6.6.2"
-  },
-  "peerDependencies": {
-    "@malkab/appian": "^3.5.0"
   }
 }
