@@ -351,7 +351,7 @@ export function generateDefaultPgOrmMethods(
             if ((<any>e).code === EPGERRORCODES.foreign_key_violation) {
 
               throw new RestOrm.OrmError({
-                code: RestOrm.EORMERRORCODES.FOREIGN_KEY_VIOLATION,
+                code: RestOrm.EORMERRORCODES.UNMET_DEPENDENCY,
                 error: e,
                 message: 'foreign key violation'
               })

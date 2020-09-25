@@ -32,10 +32,10 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
-"@malkab/appian@^3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@malkab/appian/-/appian-3.4.0.tgz#5dffefc383f2d77cc3659cf28e2a825168f5cd8f"
-  integrity sha512-L7nI2Nw51NNmKskaAVI9dUKXFqF5IZToWpSKph7Z6gw1sHr3Q05tGyNkvNrv1myNYX8dLgkBOHagMDQWVaAYZA==
+"@malkab/appian@^3.5.0":
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/@malkab/appian/-/appian-3.5.0.tgz#d28d5d97e230eeb6fbce4a1a4c552617c909f959"
+  integrity sha512-VfFNPyk0OhaBvWVqGDccLF6QmrD61wcdN3YSb7euStpFJaurY2v8kmd06vw/2PwLzko6XDrt3Avowby8jG0t9w==
   dependencies:
     "@malkab/node-logger" "^1.0.1"
     "@malkab/node-utils" "^1.2.1"

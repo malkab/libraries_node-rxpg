@@ -4,7 +4,6 @@
  *
  */
 export enum EPGERRORCODES {
-
   "undefined_table" = "42P01",
   "syntax_error" = "42601",
   "unique_violation" = "23505",
@@ -12,5 +11,4 @@ export enum EPGERRORCODES {
   "indeterminate_datatype" = "42P18",
   "invalid_text_representation" = "22P02",
   "foreign_key_violation" = "23503"
-
 }
