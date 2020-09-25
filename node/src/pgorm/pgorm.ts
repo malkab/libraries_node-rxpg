@@ -507,7 +507,7 @@ export function select$<T>({
 
           throw new OrmError.OrmError({
             code: OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-            error: new Error("invalid object parameters"),
+            error: e,
             message: "invalid object parameters"
           })
 
@@ -516,7 +516,7 @@ export function select$<T>({
         // Throw any other error
         throw new OrmError.OrmError({
           code: OrmError.EORMERRORCODES.UNSPECIFIED_DB_ERROR,
-          error: new Error("unspecified db error"),
+          error: e,
           message: "unspecified db error"
         })
 
@@ -651,7 +651,7 @@ export function selectMany$<T>({
 
           throw new OrmError.OrmError({
             code: OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-            error: new Error("invalid object parameters"),
+            error: e,
             message: "invalid object parameters"
           })
 
@@ -660,7 +660,7 @@ export function selectMany$<T>({
         // Throw any other error
         throw new OrmError.OrmError({
           code: OrmError.EORMERRORCODES.UNSPECIFIED_DB_ERROR,
-          error: new Error("unspecified db error"),
+          error: e,
           message: "unspecified db error"
         })
 
