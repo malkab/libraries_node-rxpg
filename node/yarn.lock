@@ -23,10 +23,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@malkab/ts-utils@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@malkab/ts-utils/-/ts-utils-4.0.0.tgz#c43144d984994a7a649190fb3081d94ef584c7dc"
-  integrity sha512-LcHZ0RumFr5OMeUFKfoiJ71q32oDUMdsyhJ4qbFTa+H/WJpBKS6/+3XQ5S1rbYmwn6oatN7khBI99ZsBc8BQyQ==
+"@malkab/ts-utils@^4.0.3":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@malkab/ts-utils/-/ts-utils-4.0.3.tgz#96e1e5760cadcb466bb8fefd303ee3e558cfd4fd"
+  integrity sha512-h832ZaHkwU357zy00iGKjVLY4Ot+5hBfPZIrTebhwQdTixvuPTrXpQqchAkqEqghtrwbm0+lZVZAW7W9I0OIwA==
   dependencies:
     lodash "^4.17.20"
     moment "^2.24.0"

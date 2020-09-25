@@ -6,7 +6,6 @@ import * as rxo from "rxjs/operators";
 
 import { EPGERRORCODES, QueryResult, RxPg } from "../index";
 
-
 /**
  *
  * These are a bunch of helpers to add standard persistence to objects of
@@ -15,6 +14,9 @@ import { EPGERRORCODES, QueryResult, RxPg } from "../index";
  * helpers are provided to make this process as standard as possible for future
  * integration with an standard matching REST POST / GET / PATCH / DELETE
  * workflow on Appian routers.
+ *
+ * This ORM adapters (this is for PG, others adapt to RxRedis, for example). All
+ * adapters must return errors in the ts-utils OrmError error.
  *
  */
 
@@ -151,7 +153,6 @@ import { EPGERRORCODES, QueryResult, RxPg } from "../index";
  *
  */
 
-
 /**
  *
  * This is the interface an object must implement to comply with the standard
@@ -243,58 +244,43 @@ export interface IPgOrm<T> {
 interface IDefaultPgOrmMethodsDefinitions {
   /**
    *
-   * If true, will map PG errors to API errors, for an automatic integration
-   * within the REST API router standard generation.
+   * The **pgInsert$** operation. The SQL must be a paramtrized INSERT query and
+   * the parameters will be taken from the function params, that will push an
+   * array of members of the instance being inserted that must match the
+   * parameter's order at the SQL definition.
    *
    */
-  restApiErrorMapping: boolean;
+  pgInsert$?: {
+    sql: string;
+    params: () => any[];
+    returns?: (result: QueryResult) => any;
+  },
   /**
    *
-   * Methods.
+   * The **pgUpdate$** operation. The SQL must be a paramtrized UPDATE query and
+   * the parameters will be taken from the function params, that will push an
+   * array of members of the instance being inserted that must match the
+   * parameter's order at the SQL definition.
    *
    */
-  methods: {
-    /**
-     *
-     * The **pgInsert$** operation. The SQL must be a paramtrized INSERT query and
-     * the parameters will be taken from the function params, that will push an
-     * array of members of the instance being inserted that must match the
-     * parameter's order at the SQL definition.
-     *
-     */
-    pgInsert$?: {
-      sql: string;
-      params: () => any[];
-      returns?: (result: QueryResult) => any;
-    },
-    /**
-     *
-     * The **pgUpdate$** operation. The SQL must be a paramtrized UPDATE query and
-     * the parameters will be taken from the function params, that will push an
-     * array of members of the instance being inserted that must match the
-     * parameter's order at the SQL definition.
-     *
-     */
-    pgUpdate$?: {
-      sql: string;
-      params: () => any[];
-      returns?: (result: QueryResult) => any;
-    },
-    /**
-     *
-     * The **pgDelete$** operation. The SQL must be a paramtrized DELETE query and
-     * the parameters will be taken from the function params, that will push an
-     * array of members of the instance being inserted that must match the
-     * parameter's order at the SQL definition.
-     *
-     */
-    pgDelete$?: {
-      sql: string;
-      params: () => any[];
-      returns?: (result: QueryResult) => any;
-    }
+  pgUpdate$?: {
+    sql: string;
+    params: () => any[];
+    returns?: (result: QueryResult) => any;
+  },
+  /**
+   *
+   * The **pgDelete$** operation. The SQL must be a paramtrized DELETE query and
+   * the parameters will be taken from the function params, that will push an
+   * array of members of the instance being inserted that must match the
+   * parameter's order at the SQL definition.
+   *
+   */
+  pgDelete$?: {
+    sql: string;
+    params: () => any[];
+    returns?: (result: QueryResult) => any;
   }
-
 }
 
 /**
@@ -313,13 +299,13 @@ export function generateDefaultPgOrmMethods(
   config: IDefaultPgOrmMethodsDefinitions
 ): void {
 
-  Object.keys(config.methods).map((x: string) => {
+  Object.keys(Object.keys(config).map((x: string) => {
 
     const c: {
       sql: string,
       params: () => any[],
       returns?: (result: QueryResult) => any
-    } = (<any>config.methods)[x];
+    } = (<any>config)[x];
 
     object[x] = (pg: RxPg): rx.Observable<any> => {
 
@@ -332,55 +318,33 @@ export function generateDefaultPgOrmMethods(
 
         rxo.catchError((e: Error) => {
 
-          // Map PG errors to ORM ones?
-          if (config.restApiErrorMapping) {
+          // Invalid parameters
+          if ((<any>e).code === EPGERRORCODES.invalid_text_representation) {
 
-            // Invalid parameters
-            if ((<any>e).code === EPGERRORCODES.invalid_text_representation) {
-
-              throw new OrmError.OrmError({
-                code: OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-                error: e,
-                message: 'invalid object parameters'
-              })
-
-            }
-
-            // Foreign key violations
-            if ((<any>e).code === EPGERRORCODES.foreign_key_violation) {
-
-              throw new OrmError.OrmError({
-                code: OrmError.EORMERRORCODES.UNMET_DEPENDENCY,
-                error: e,
-                message: 'foreign key violation'
-              })
-
-            }
-
-            // Duplicated ID
-            if ((<any>e).code === EPGERRORCODES.unique_violation) {
-
-              throw new OrmError.OrmError({
-                code: OrmError.EORMERRORCODES.DUPLICATED,
-                error: e,
-                message: 'duplicated key'
-              })
-
-            }
-
-            // Default throw
-            throw new OrmError.OrmError({
-              code: OrmError.EORMERRORCODES.UNSPECIFIED_DB_ERROR,
-              error: e,
-              message: "unspecified db error"
-            })
-
-          } else {
-
-            // Throw original error, do not map to OrmError.OrmError
-            throw e;
+            throw new OrmError.OrmError(e,
+              OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS);
 
           }
+
+          // Foreign key violations
+          if ((<any>e).code === EPGERRORCODES.foreign_key_violation) {
+
+            throw new OrmError.OrmError(e,
+              OrmError.EORMERRORCODES.UNMET_BACKEND_DEPENDENCY);
+
+          }
+
+          // Duplicated ID
+          if ((<any>e).code === EPGERRORCODES.unique_violation) {
+
+            throw new OrmError.OrmError(e,
+              OrmError.EORMERRORCODES.DUPLICATED);
+
+          }
+
+          // Default throw
+          throw new OrmError.OrmError(e,
+            OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR);
 
         }),
 
@@ -393,11 +357,11 @@ export function generateDefaultPgOrmMethods(
 
         })
 
-      );
+      )
 
     }
 
-  })
+  }))
 
 }
 
@@ -499,31 +463,17 @@ export function select$<T>({
 
     rxo.catchError((e: any) => {
 
-      if (restApiErrorMapping) {
+      // User provided wrong select parameters
+      if (e.code === EPGERRORCODES.invalid_text_representation) {
 
-        // User provided wrong select parameters
-        if (e.code === EPGERRORCODES.invalid_text_representation) {
-
-          throw new OrmError.OrmError({
-            code: OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-            error: e,
-            message: "invalid object parameters"
-          })
-
-        }
-
-        // Throw any other error
-        throw new OrmError.OrmError({
-          code: OrmError.EORMERRORCODES.UNSPECIFIED_DB_ERROR,
-          error: e,
-          message: "unspecified db error"
-        })
-
-      } else {
-
-        throw e;
+        throw new OrmError.OrmError(e,
+          OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS);
 
       }
+
+      // Throw any other error
+      throw new OrmError.OrmError(e,
+        OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR);
 
     }),
 
@@ -531,11 +481,8 @@ export function select$<T>({
 
       if (o.rows.length === 0) {
 
-        throw new OrmError.OrmError({
-          code: OrmError.EORMERRORCODES.NOT_FOUND,
-          error: new Error("not found"),
-          message: "not found"
-        })
+        throw new OrmError.OrmError(new Error("not found"),
+          OrmError.EORMERRORCODES.NOT_FOUND);
 
       }
 
@@ -557,20 +504,8 @@ export function select$<T>({
 
       }
 
-      // Detect initialization errors
-      if (restApiErrorMapping) {
-
-        throw new OrmError.OrmError({
-          code: OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT,
-          error: e,
-          message: "error initializing object"
-        })
-
-      } else {
-
-        throw e;
-
-      }
+      throw new OrmError.OrmError(e,
+        OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT);
 
     })
 
@@ -643,31 +578,17 @@ export function selectMany$<T>({
 
     rxo.catchError((e: any) => {
 
-      if (restApiErrorMapping) {
+      // User provided wrong select parameters
+      if (e.code === EPGERRORCODES.invalid_text_representation) {
 
-        // User provided wrong select parameters
-        if (e.code === EPGERRORCODES.invalid_text_representation) {
-
-          throw new OrmError.OrmError({
-            code: OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-            error: e,
-            message: "invalid object parameters"
-          })
-
-        }
-
-        // Throw any other error
-        throw new OrmError.OrmError({
-          code: OrmError.EORMERRORCODES.UNSPECIFIED_DB_ERROR,
-          error: e,
-          message: "unspecified db error"
-        })
-
-      } else {
-
-        throw e;
+        throw new OrmError.OrmError(e,
+          OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS);
 
       }
+
+      // Throw any other error
+      throw new OrmError.OrmError(e,
+        OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR);
 
     }),
 
@@ -682,19 +603,8 @@ export function selectMany$<T>({
 
     rxo.catchError((e: any) => {
 
-      if (restApiErrorMapping) {
-
-        throw new OrmError.OrmError({
-          code: OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT,
-          error: e,
-          message: "error initializing object"
-        })
-
-      } else {
-
-        throw e;
-
-      }
+      throw new OrmError.OrmError(e,
+        OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT);
 
     }),
 

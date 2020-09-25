@@ -28,17 +28,17 @@ const o0: OrmTestSingleKey = new OrmTestSingleKey({ a: 8, b: "A", c: 78, additio
 rx.concat(
   // o0.pgInsert$(pg),
   // o1.pgInsert$(pg),
-  o0.patch$({ b: "y3u", c: 17 }),
-  o0.pgUpdate$(pg),
-  OrmTestSingleKey.get$(pg, 8, 48484848),
+  // o0.patch$({ b: "y3u", c: 17 }),
+  // o0.pgUpdate$(pg),
+  OrmTestSingleKey.get$(pg, 108, 48484848),
   // OrmTestSingleKey.getList$(pg, 100, 33),
-  o0.pgDelete$(pg),
+  // o0.pgDelete$(pg),
   // o1.pgDelete$(pg)
 ).subscribe(
 
   (n: any) => console.log("next", n),
 
-  (error: Error | OrmError.OrmError) => console.log("error", error),
+  (error: OrmError.OrmError) => console.log("error", error),
 
   () => console.log("completed")
 

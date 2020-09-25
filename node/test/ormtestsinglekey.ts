@@ -105,24 +105,21 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
     // from parametrized SQL and functions that returns the correct paramters
     // sequence in this object context
     PgOrm.generateDefaultPgOrmMethods(this, {
-      restApiErrorMapping: true,
-      methods: {
-        pgInsert$: {
-          sql: 'insert into singlekeyobjects values ($1, $2, $3);',
-          params: () => [ this.a, this.b, this.c ],
-          // returns: (o: QueryResult) => o
-        },
-        pgUpdate$: {
-          sql: 'update singlekeyobjects set b=$1, c=$3 where a=$2;',
-          params: () => [ this.b, this.a, this.c ],
-          returns: (o: QueryResult) => "OK"
-        },
-        // pgDelete$: {
-        //   sql: 'delete from singlekeyob3jects where a=$1',
-        //   params: () => [ this.a ],
-        //   returns: (o: QueryResult) => o.rowCount
-        // }
-      }
+      pgInsert$: {
+        sql: 'insert into singlekeyobjects values ($1, $2, $3);',
+        params: () => [ this.a, this.b, this.c ],
+        // returns: (o: QueryResult) => o
+      },
+      pgUpdate$: {
+        sql: 'update singlekeyobjects set b=$1, c=$3 where a=$2;',
+        params: () => [ this.b, this.a, this.c ],
+        returns: (o: QueryResult) => "OK"
+      },
+      // pgDelete$: {
+      //   sql: 'delete from singlekeyob3jects where a=$1',
+      //   params: () => [ this.a ],
+      //   returns: (o: QueryResult) => o.rowCount
+      // }
     })
 
   }

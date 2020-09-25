@@ -3,20 +3,20 @@ root: /home/git/malkab-libraries-node/rxpg
 
 windows:
   - docker-dev: >
+      clear ;
+      sleep 7 ;
       cd docker ;
       . mlkcontext common ;
-      sleep 7 ;
-      clear ;
       ./020_docker_node_interactive.sh
   - docker-psql: >
+      clear ;
+      sleep 4 ;
       cd docker ;
       . mlkcontext common ;
-      sleep 4 ;
-      clear ;
       ./030_docker_postgis_psql.sh
   - docker-pg: >
+      clear ;
+      sleep 0.5 ;
       cd docker ;
       . mlkcontext common ;
-      sleep 0.5 ;
-      clear ;
       ./010_compose_up.sh
