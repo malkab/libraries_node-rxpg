@@ -105,7 +105,7 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
     // from parametrized SQL and functions that returns the correct paramters
     // sequence in this object context
     PgOrm.generateDefaultPgOrmMethods(this, {
-      restApiErrorMapping: false,
+      restApiErrorMapping: true,
       methods: {
         pgInsert$: {
           sql: 'insert into singlekeyobjects values ($1, $2, $3);',
@@ -116,7 +116,12 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
           sql: 'update singlekeyobjects set b=$1, c=$3 where a=$2;',
           params: () => [ this.b, this.a, this.c ],
           returns: (o: QueryResult) => "OK"
-        }
+        },
+        // pgDelete$: {
+        //   sql: 'delete from singlekeyob3jects where a=$1',
+        //   params: () => [ this.a ],
+        //   returns: (o: QueryResult) => o.rowCount
+        // }
       }
     })
 
@@ -142,7 +147,7 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
 
       rxo.map((o: any) => {
 
-        console.log("D: this comes from the custom delete$ method");
+        console.log("this comes from the custom delete$ method");
         return this;
 
       })
@@ -182,7 +187,7 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       newFunction: (params: any) => {
         // Errors can be launched here safely
         // throw new Error("ERROR HERE");
-        console.log("D: params at newFunction", params);
+        console.log("params at newFunction", params);
         console.log("PERFORMING COMPLEX ASYNCH INIT LOGIC HERE");
         return rx.of(new OrmTestSingleKey({ ...params, additional: additional }));
       },

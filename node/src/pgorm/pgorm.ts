@@ -1,11 +1,10 @@
-import { RxPg, EPGERRORCODES, QueryResult } from "../index";
+import { OrmError } from "@malkab/ts-utils";
 
 import * as rx from "rxjs";
 
 import * as rxo from "rxjs/operators";
 
-import { OrmError } from "@malkab/ts-utils";
-
+import { EPGERRORCODES, QueryResult, RxPg } from "../index";
 
 
 /**
@@ -372,7 +371,7 @@ export function generateDefaultPgOrmMethods(
             // Default throw
             throw new OrmError.OrmError({
               code: OrmError.EORMERRORCODES.UNSPECIFIED_DB_ERROR,
-              error: new Error("unspecified db error"),
+              error: e,
               message: "unspecified db error"
             })
 

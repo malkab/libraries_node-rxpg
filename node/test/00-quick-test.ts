@@ -22,17 +22,17 @@ const pg: RxPg = new RxPg({
   host: "postgis"
 })
 
-// const o0: OrmTestSingleKey = new OrmTestSingleKey({ a: 11, b: "A", c: 0, additional: 0 });
+const o0: OrmTestSingleKey = new OrmTestSingleKey({ a: 8, b: "A", c: 78, additional: 0 });
 // const o1: OrmTestSingleKey = new OrmTestSingleKey({ a: 1, b: "B", c: 1, additional: 1 });
 
 rx.concat(
   // o0.pgInsert$(pg),
   // o1.pgInsert$(pg),
-  // o0.patch$({ b: "yu", c: 17 }),
-  // o0.pgUpdate$(pg),
-  // OrmTestSingleKey.get$(pg, 2, 48484848),
-  OrmTestSingleKey.getList$(pg, 100, 33),
-  // o0.pgDelete$(pg),
+  o0.patch$({ b: "y3u", c: 17 }),
+  o0.pgUpdate$(pg),
+  OrmTestSingleKey.get$(pg, 8, 48484848),
+  // OrmTestSingleKey.getList$(pg, 100, 33),
+  o0.pgDelete$(pg),
   // o1.pgDelete$(pg)
 ).subscribe(
 
