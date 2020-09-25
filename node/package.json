@@ -1,6 +1,6 @@
 {
   "name": "@malkab/rxpg",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "A RxJS PostgreSQL interface.",
   "scope": "@malkab",
   "author": {
@@ -37,7 +37,6 @@
     "node": "^12.0.0"
   },
   "devDependencies": {
-    "@malkab/appian": "^3.5.0",
     "@types/chai": "^4.2.12",
     "@types/lodash": "^4.14.161",
     "@types/mocha": "^8.0.3",
@@ -64,5 +63,8 @@
     "pg": "^8.3.3",
     "pg-native": "^3.0.0",
     "rxjs": "^6.6.2"
+  },
+  "peerDependencies": {
+    "@malkab/appian": "^3.5.0"
   }
 }
