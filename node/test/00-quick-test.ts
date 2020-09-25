@@ -16,7 +16,7 @@ import * as rx from "rxjs";
 
 import { OrmTestSingleKey } from "./ormtestsinglekey";
 
-import { RestOrm } from "@malkab/appian";
+import { OrmError } from "@malkab/ts-utils";
 
 const pg: RxPg = new RxPg({
   host: "postgis"
@@ -30,7 +30,7 @@ rx.concat(
   // o1.pgInsert$(pg),
   // o0.patch$({ b: "yu", c: 17 }),
   // o0.pgUpdate$(pg),
-  OrmTestSingleKey.get$(pg, 1, 48484848),
+  // OrmTestSingleKey.get$(pg, 2, 48484848),
   OrmTestSingleKey.getList$(pg, 100, 33),
   // o0.pgDelete$(pg),
   // o1.pgDelete$(pg)
@@ -38,7 +38,7 @@ rx.concat(
 
   (n: any) => console.log("next", n),
 
-  (error: Error | RestOrm.OrmError) => console.log("error", error),
+  (error: Error | OrmError.OrmError) => console.log("error", error),
 
   () => console.log("completed")
 

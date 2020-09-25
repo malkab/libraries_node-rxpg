@@ -547,6 +547,18 @@ export function select$<T>({
 
     rxo.catchError((e: any) => {
 
+      // Filter the OrmError NOT_FOUND of the last pipe
+      if (e.code) {
+
+        if (e.code === OrmError.EORMERRORCODES.NOT_FOUND) {
+
+          throw e;
+
+        }
+
+      }
+
+      // Detect initialization errors
       if (restApiErrorMapping) {
 
         throw new OrmError.OrmError({
