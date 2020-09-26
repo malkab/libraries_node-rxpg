@@ -26,8 +26,9 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
 
   // Placeholder for the required functions at the IPgPersistence interface
   // These will be created automatically by a helper at construction time
-  public pgInsert$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
-  public pgUpdate$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
+  public pgInsert$: (pg: RxPg) => rx.Observable<any>;
+  public pgUpdate$: (pg: RxPg) => rx.Observable<any>;
+  public pgDelete$: (pg: RxPg) => rx.Observable<any>;
 
   /**
    *
@@ -81,12 +82,6 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       additional?: number;
   }) {
 
-    if (isNaN(+a)) {
-
-      throw new Error("a must be a number");
-
-    }
-
     if (a > 10) {
 
       throw new Error("a > 10");
@@ -96,30 +91,28 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
     console.log("COMPLEX INITIALIZATION LOGIC HERE", additional);
 
     this._a = +a;
-
-    // Using the patch$ function here to set the rest of the object at
-    // construction level
-    this.patch$({ b: b, c: c });
+    this._b = b;
+    this._c = +c;
 
     // This helper generates the pgInsert$, pgUpdate$, and pgDelete$ ORM methods
     // from parametrized SQL and functions that returns the correct paramters
     // sequence in this object context
     PgOrm.generateDefaultPgOrmMethods(this, {
       pgInsert$: {
-        sql: 'insert into singlekeyobjects values ($1, $2, $3);',
+        sql: 'insert into singlekeyobjects values ($1, $2, $3) returning *;',
         params: () => [ this.a, this.b, this.c ],
         // returns: (o: QueryResult) => o
       },
       pgUpdate$: {
-        sql: 'update singlekeyobjects set b=$1, c=$3 where a=$2;',
+        sql: 'update singlekeyobjects set b=$1, c=$3 where a=$2 returning *;',
         params: () => [ this.b, this.a, this.c ],
-        returns: (o: QueryResult) => "OK"
+        // returns: (o: QueryResult) => "OK"
       },
-      // pgDelete$: {
-      //   sql: 'delete from singlekeyob3jects where a=$1',
-      //   params: () => [ this.a ],
-      //   returns: (o: QueryResult) => o.rowCount
-      // }
+      pgDelete$: {
+        sql: 'delete from singlekeyobjects where a=$1 returning *;',
+        params: () => [ this.a ],
+        // returns: (o: QueryResult) => o.rowCount
+      }
     })
 
   }
@@ -131,27 +124,27 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
    * PgOrm to make implement standard errors handling and such.
    *
    */
-  public pgDelete$(pg: RxPg): rx.Observable<OrmTestSingleKey> {
+  // public pgDelete$(pg: RxPg): rx.Observable<OrmTestSingleKey> {
 
-    // Here goes a super complex deletion logic
-    return PgOrm.executeParamQuery$({
-      pg: pg,
-      sql: 'delete from singlekeyobjects where a=$1',
-      params: () => [ this.a ],
-      returns: (o: QueryResult) => o.rowCount
-    })
-    .pipe(
+  //   // Here goes a super complex deletion logic
+  //   return PgOrm.executeParamQuery$({
+  //     pg: pg,
+  //     sql: 'delete from singlekeyobjects where a=$1',
+  //     params: () => [ this.a ],
+  //     returns: (o: QueryResult) => o.rowCount
+  //   })
+  //   .pipe(
 
-      rxo.map((o: any) => {
+  //     rxo.map((o: any) => {
 
-        console.log("this comes from the custom delete$ method");
-        return this;
+  //       console.log("this comes from the custom delete$ method");
+  //       return this;
 
-      })
+  //     })
 
-    )
+  //   )
 
-  }
+  // }
 
   /**
    *
@@ -187,8 +180,7 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
         console.log("params at newFunction", params);
         console.log("PERFORMING COMPLEX ASYNCH INIT LOGIC HERE");
         return rx.of(new OrmTestSingleKey({ ...params, additional: additional }));
-      },
-      restApiErrorMapping: true
+      }
     })
 
   }
@@ -202,9 +194,9 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
 
     return PgOrm.selectMany$({
       pg: pg,
-      // params: () => [ id ],
-      params: () => [],
-      sql: "select * from singlekeyobjects;",
+      params: () => [ id ],
+      // params: () => [],
+      sql: "select * from singlekeyobjects where a<$1;",
       type: OrmTestSingleKey,
       /**
        *
@@ -214,30 +206,8 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       newFunction: (params: any) => {
         console.log("PERFORMING COMPLEX ASYNCH INIT LOGIC HERE FOR MULTI");
         return rx.of(new OrmTestSingleKey({ ...params, additional: params.a + params.b + additional }));
-      },
-      restApiErrorMapping: true
+      }
     })
-
-  }
-
-  /**
-   *
-   * This is the mandatory **patch$** method used to get an structure of params
-   * that is a subset of that of the constructor and modify the status of the
-   * object accordingly.
-   *
-   */
-  public patch$({
-      b,
-      c
-    }: {
-      b: string;
-      c: number;
-  }): rx.Observable<OrmTestSingleKey> {
-
-    this._b = b;
-    this._c = c;
-    return rx.of(this);
 
   }
 

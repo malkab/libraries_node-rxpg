@@ -299,15 +299,12 @@ export function generateDefaultPgOrmMethods(
   config: IDefaultPgOrmMethodsDefinitions
 ): void {
 
-  Object.keys(Object.keys(config).map((x: string) => {
+  // Check if pgInsert$ has been configured
+  if(config.pgInsert$) {
 
-    const c: {
-      sql: string,
-      params: () => any[],
-      returns?: (result: QueryResult) => any
-    } = (<any>config)[x];
+    const c = config.pgInsert$;
 
-    object[x] = (pg: RxPg): rx.Observable<any> => {
+    object["pgInsert$"] = (pg: RxPg): rx.Observable<any> => {
 
       return executeParamQuery$({
         pg: pg,
@@ -322,7 +319,8 @@ export function generateDefaultPgOrmMethods(
           if ((<any>e).code === EPGERRORCODES.invalid_text_representation) {
 
             throw new OrmError.OrmError(e,
-              OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS);
+              OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+              `RxPg ORM ${object.constructor.name} pgInsert$ method params [${c.params()}] invalid object parameters: `);
 
           }
 
@@ -330,7 +328,8 @@ export function generateDefaultPgOrmMethods(
           if ((<any>e).code === EPGERRORCODES.foreign_key_violation) {
 
             throw new OrmError.OrmError(e,
-              OrmError.EORMERRORCODES.UNMET_BACKEND_DEPENDENCY);
+              OrmError.EORMERRORCODES.UNMET_BACKEND_DEPENDENCY,
+              `RxPg ORM ${object.constructor.name} pgInsert$ method params [${c.params()}] unmet backend dependency: `);
 
           }
 
@@ -338,13 +337,15 @@ export function generateDefaultPgOrmMethods(
           if ((<any>e).code === EPGERRORCODES.unique_violation) {
 
             throw new OrmError.OrmError(e,
-              OrmError.EORMERRORCODES.DUPLICATED);
+              OrmError.EORMERRORCODES.DUPLICATED,
+              `RxPg ORM ${object.constructor.name} pgInsert$ method params [${c.params()}] duplicated: `);
 
           }
 
           // Default throw
           throw new OrmError.OrmError(e,
-            OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR);
+            OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
+            `RxPg ORM ${object.constructor.name} pgInsert$ method params [${c.params()}] unspecified backend error: `);
 
         }),
 
@@ -361,7 +362,128 @@ export function generateDefaultPgOrmMethods(
 
     }
 
-  }))
+  }
+
+  // Check if pgUpdate$ has been configured
+  if(config.pgUpdate$) {
+
+    const c = config.pgUpdate$;
+
+    object["pgUpdate$"] = (pg: RxPg): rx.Observable<any> => {
+
+      return executeParamQuery$({
+        pg: pg,
+        sql: c.sql,
+        params: c.params
+      })
+      .pipe(
+
+        rxo.catchError((e: Error) => {
+
+          // Invalid parameters
+          if ((<any>e).code === EPGERRORCODES.invalid_text_representation) {
+
+            throw new OrmError.OrmError(e,
+              OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+              `RxPg ORM ${object.constructor.name} pgUpdate$ method params [${c.params()}] invalid object parameters: `);
+
+          }
+
+          // Foreign key violations
+          if ((<any>e).code === EPGERRORCODES.foreign_key_violation) {
+
+            throw new OrmError.OrmError(e,
+              OrmError.EORMERRORCODES.UNMET_BACKEND_DEPENDENCY,
+              `RxPg ORM ${object.constructor.name} pgUpdate$ method params [${c.params()}] unmet backend dependency: `);
+
+          }
+
+          // Default throw
+          throw new OrmError.OrmError(e,
+            OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
+            `RxPg ORM ${object.constructor.name} pgUpdate$ method params [${c.params()}] unspecified backend error: `);
+
+        }),
+
+        rxo.map((o: QueryResult) => {
+
+          // Check if there was any object updated, else throw not found
+          if (o.rowCount === 0) {
+
+            throw new OrmError.OrmError(new Error("not found"),
+              OrmError.EORMERRORCODES.NOT_FOUND,
+              `RxPg ORM ${object.constructor.name} pgUpdate$ method params [${c.params()}] not found error: `);
+
+          }
+
+          const r: (o: QueryResult) => any = c.returns !== undefined ?
+            c.returns : (o: QueryResult) => o
+
+          return r(o);
+
+        })
+
+      )
+
+    }
+
+  }
+
+  // Check if pgDelete$ has been configured
+  if(config.pgDelete$) {
+
+    const c = config.pgDelete$;
+
+    object["pgDelete$"] = (pg: RxPg): rx.Observable<any> => {
+
+      return executeParamQuery$({
+        pg: pg,
+        sql: c.sql,
+        params: c.params
+      })
+      .pipe(
+
+        rxo.catchError((e: Error) => {
+
+          // Invalid parameters
+          if ((<any>e).code === EPGERRORCODES.invalid_text_representation) {
+
+            throw new OrmError.OrmError(e,
+              OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+              `RxPg ORM ${object.constructor.name} pgDelete$ method params [${c.params()}] invalid object parameters: `);
+
+          }
+
+          // Default throw
+          throw new OrmError.OrmError(e,
+            OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
+            `RxPg ORM ${object.constructor.name} pgDelete$ method params [${c.params()}] unspecified backend error: `);
+
+        }),
+
+        rxo.map((o: QueryResult) => {
+
+          // Check if there was any object updated, else throw not found
+          if (o.rowCount === 0) {
+
+            throw new OrmError.OrmError(new Error("not found"),
+              OrmError.EORMERRORCODES.NOT_FOUND,
+              `RxPg ORM ${object.constructor.name} pgDelete$ method params [${c.params()}] not found error: `);
+
+          }
+
+          const r: (o: QueryResult) => any = c.returns !== undefined ?
+            c.returns : (o: QueryResult) => o
+
+          return r(o);
+
+        })
+
+      )
+
+    }
+
+  }
 
 }
 
@@ -445,14 +567,12 @@ export function select$<T>({
   sql,
   type,
   params,
-  restApiErrorMapping = true,
   newFunction = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
   params: () => any[];
-  restApiErrorMapping?: boolean;
   newFunction?: (params: any) => rx.Observable<T>;
 }): rx.Observable<T> {
 
@@ -461,28 +581,12 @@ export function select$<T>({
     params()
   ).pipe(
 
-    rxo.catchError((e: any) => {
-
-      // User provided wrong select parameters
-      if (e.code === EPGERRORCODES.invalid_text_representation) {
-
-        throw new OrmError.OrmError(e,
-          OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS);
-
-      }
-
-      // Throw any other error
-      throw new OrmError.OrmError(e,
-        OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR);
-
-    }),
-
     rxo.concatMap((o: QueryResult) => {
 
+      // Launch base not found error here for later caching at catchError
       if (o.rows.length === 0) {
 
-        throw new OrmError.OrmError(new Error("not found"),
-          OrmError.EORMERRORCODES.NOT_FOUND);
+        throw new Error("not found");
 
       }
 
@@ -491,21 +595,38 @@ export function select$<T>({
 
     }),
 
-    rxo.catchError((e: any) => {
+    rxo.catchError((e: Error) => {
 
       // Filter the OrmError NOT_FOUND of the last pipe
-      if (e.code) {
+      if (e.message === "not found") {
 
-        if (e.code === OrmError.EORMERRORCODES.NOT_FOUND) {
+        throw new OrmError.OrmError(e,
+          OrmError.EORMERRORCODES.NOT_FOUND,
+          `RxPg ORM ${type.constructor.name} select$ method params [${params()}] not found error: `);
 
-          throw e;
+      }
 
-        }
+      // User provided wrong select parameters
+      if ((<any>e).code === EPGERRORCODES.invalid_text_representation) {
+
+        throw new OrmError.OrmError(e,
+          OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+          `RxPg ORM ${type.constructor.name} select$ method params [${params()}] invalid object parameters: `);
+
+      }
+
+      // A PG error code not catched before
+      if ((<any>e).code) {
+
+        throw new OrmError.OrmError(e,
+          OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
+          `RxPg ORM ${type.constructor.name} select$ method params [${params()}] unspecified backend error: `);
 
       }
 
       throw new OrmError.OrmError(e,
-        OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT);
+        OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT,
+        `RxPg ORM ${type.constructor.name} select$ method params [${params()}] instantiation error by values retrieved from the backend: `);
 
     })
 
@@ -559,14 +680,12 @@ export function selectMany$<T>({
   sql,
   type,
   params,
-  restApiErrorMapping = true,
   newFunction = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
   params: () => any[];
-  restApiErrorMapping?: boolean;
   newFunction?: (params: any) => rx.Observable<T>;
 }): rx.Observable<T[]> {
 
@@ -576,35 +695,39 @@ export function selectMany$<T>({
   )
   .pipe(
 
-    rxo.catchError((e: any) => {
-
-      // User provided wrong select parameters
-      if (e.code === EPGERRORCODES.invalid_text_representation) {
-
-        throw new OrmError.OrmError(e,
-          OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS);
-
-      }
-
-      // Throw any other error
-      throw new OrmError.OrmError(e,
-        OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR);
-
-    }),
-
     rxo.concatMap((o: QueryResult) => {
 
       const obs: rx.Observable<T>[] =
-        o.rows.map((r: any) => newFunction({ ...r }));
+        o.rows.map((r: any) => newFunction({ ...r,
+          selectMany$params: { pg: pg, params: params() } }));
 
       return rx.zip(...obs);
 
     }),
 
-    rxo.catchError((e: any) => {
+    rxo.catchError((e: Error) => {
+
+      // User provided wrong select parameters
+      if ((<any>e).code === EPGERRORCODES.invalid_text_representation) {
+
+        throw new OrmError.OrmError(e,
+          OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
+          `RxPg ORM ${type.constructor.name} selectMany$ method params [${params()}] invalid object parameters: `);
+
+      }
+
+      // A PG error code not catched before
+      if ((<any>e).code) {
+
+        throw new OrmError.OrmError(e,
+          OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
+          `RxPg ORM ${type.constructor.name} selectMany$ method params [${params()}] unspecified backend error: `);
+
+      }
 
       throw new OrmError.OrmError(e,
-        OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT);
+        OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT,
+        `RxPg ORM ${type.constructor.name} selectMany$ method params [${params()}] instantiation error by values retrieved from the backend: `);
 
     }),
 

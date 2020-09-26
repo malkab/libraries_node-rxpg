@@ -5,12 +5,26 @@
 */
 begin;
 
+/**
+
+  This table is for testing the foreign key error
+
+*/
+drop table if exists dependency cascade;
+
+create table dependency(
+  c integer primary key
+);
+
+insert into dependency values(1);
+insert into dependency values(2);
+
 drop table if exists singlekeyobjects;
 
 create table singlekeyobjects(
   a integer primary key,
   b varchar,
-  c integer
+  c integer references dependency(c)
 );
 
 drop table if exists dualkeyobjects;
