@@ -602,7 +602,7 @@ export function select$<T>({
 
         throw new OrmError.OrmError(e,
           OrmError.EORMERRORCODES.NOT_FOUND,
-          `RxPg ORM ${type.constructor.name} select$ method params [${params()}] not found error: `);
+          `RxPg ORM ${type.name} select$ method params [${params()}] not found error: `);
 
       }
 
@@ -611,7 +611,7 @@ export function select$<T>({
 
         throw new OrmError.OrmError(e,
           OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-          `RxPg ORM ${type.constructor.name} select$ method params [${params()}] invalid object parameters: `);
+          `RxPg ORM ${type.name} select$ method params [${params()}] invalid object parameters: `);
 
       }
 
@@ -620,13 +620,13 @@ export function select$<T>({
 
         throw new OrmError.OrmError(e,
           OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
-          `RxPg ORM ${type.constructor.name} select$ method params [${params()}] unspecified backend error: `);
+          `RxPg ORM ${type.name} select$ method params [${params()}] unspecified backend error: `);
 
       }
 
       throw new OrmError.OrmError(e,
         OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT,
-        `RxPg ORM ${type.constructor.name} select$ method params [${params()}] instantiation error by values retrieved from the backend: `);
+        `RxPg ORM ${type.name} select$ method params [${params()}] instantiation error by values retrieved from the backend: `);
 
     })
 
@@ -712,7 +712,7 @@ export function selectMany$<T>({
 
         throw new OrmError.OrmError(e,
           OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-          `RxPg ORM ${type.constructor.name} selectMany$ method params [${params()}] invalid object parameters: `);
+          `RxPg ORM ${type.name} selectMany$ method params [${params()}] invalid object parameters: `);
 
       }
 
@@ -721,13 +721,13 @@ export function selectMany$<T>({
 
         throw new OrmError.OrmError(e,
           OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
-          `RxPg ORM ${type.constructor.name} selectMany$ method params [${params()}] unspecified backend error: `);
+          `RxPg ORM ${type.name} selectMany$ method params [${params()}] unspecified backend error: `);
 
       }
 
       throw new OrmError.OrmError(e,
         OrmError.EORMERRORCODES.ERROR_INSTANTIATING_OBJECT,
-        `RxPg ORM ${type.constructor.name} selectMany$ method params [${params()}] instantiation error by values retrieved from the backend: `);
+        `RxPg ORM ${type.name} selectMany$ method params [${params()}] instantiation error by values retrieved from the backend: `);
 
     }),
 
