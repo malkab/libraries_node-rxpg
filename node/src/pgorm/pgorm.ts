@@ -241,7 +241,7 @@ export interface IPgOrm<T> {
  * **pgUpdate$** / **pgDelete$** functions.
  *
  */
-interface IDefaultPgOrmMethodsDefinitions {
+interface IDefaultPgOrmMethodsDefinitions<T> {
   /**
    *
    * The **pgInsert$** operation. The SQL must be a paramtrized INSERT query and
@@ -253,7 +253,7 @@ interface IDefaultPgOrmMethodsDefinitions {
   pgInsert$?: {
     sql: string;
     params: () => any[];
-    returns?: (result: QueryResult) => any;
+    returns?: (result: QueryResult, object?: T) => any;
   },
   /**
    *
@@ -266,7 +266,7 @@ interface IDefaultPgOrmMethodsDefinitions {
   pgUpdate$?: {
     sql: string;
     params: () => any[];
-    returns?: (result: QueryResult) => any;
+    returns?: (result: QueryResult, object?: T) => any;
   },
   /**
    *
@@ -279,7 +279,7 @@ interface IDefaultPgOrmMethodsDefinitions {
   pgDelete$?: {
     sql: string;
     params: () => any[];
-    returns?: (result: QueryResult) => any;
+    returns?: (result: QueryResult, object?: T) => any;
   }
 }
 
@@ -294,9 +294,9 @@ interface IDefaultPgOrmMethodsDefinitions {
  *                      constructor.
  * @param config        The configuration of the SQL and parameters.
  */
-export function generateDefaultPgOrmMethods(
-  object: any,
-  config: IDefaultPgOrmMethodsDefinitions
+export function generateDefaultPgOrmMethods<T>(
+  object: T,
+  config: IDefaultPgOrmMethodsDefinitions<T>
 ): void {
 
   // Check if pgInsert$ has been configured
@@ -304,7 +304,7 @@ export function generateDefaultPgOrmMethods(
 
     const c = config.pgInsert$;
 
-    object["pgInsert$"] = (pg: RxPg): rx.Observable<any> => {
+    (<any>object)["pgInsert$"] = (pg: RxPg): rx.Observable<T> => {
 
       return executeParamQuery$({
         pg: pg,
@@ -320,7 +320,7 @@ export function generateDefaultPgOrmMethods(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-              `RxPg ORM ${object.constructor.name} pgInsert$ method params [${c.params()}] invalid object parameters: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${c.params()}] invalid object parameters: `);
 
           }
 
@@ -329,7 +329,7 @@ export function generateDefaultPgOrmMethods(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.UNMET_BACKEND_DEPENDENCY,
-              `RxPg ORM ${object.constructor.name} pgInsert$ method params [${c.params()}] unmet backend dependency: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${c.params()}] unmet backend dependency: `);
 
           }
 
@@ -338,21 +338,21 @@ export function generateDefaultPgOrmMethods(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.DUPLICATED,
-              `RxPg ORM ${object.constructor.name} pgInsert$ method params [${c.params()}] duplicated: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${c.params()}] duplicated: `);
 
           }
 
           // Default throw
           throw new OrmError.OrmError(e,
             OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
-            `RxPg ORM ${object.constructor.name} pgInsert$ method params [${c.params()}] unspecified backend error: `);
+            `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${c.params()}] unspecified backend error: `);
 
         }),
 
         rxo.map((o: QueryResult) => {
 
           const r: (o: QueryResult) => any = c.returns !== undefined ?
-            c.returns : (o: QueryResult) => o
+            c.returns : (o: QueryResult) => object;
 
           return r(o);
 
@@ -369,7 +369,7 @@ export function generateDefaultPgOrmMethods(
 
     const c = config.pgUpdate$;
 
-    object["pgUpdate$"] = (pg: RxPg): rx.Observable<any> => {
+    (<any>object)["pgUpdate$"] = (pg: RxPg): rx.Observable<T> => {
 
       return executeParamQuery$({
         pg: pg,
@@ -385,7 +385,7 @@ export function generateDefaultPgOrmMethods(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-              `RxPg ORM ${object.constructor.name} pgUpdate$ method params [${c.params()}] invalid object parameters: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${c.params()}] invalid object parameters: `);
 
           }
 
@@ -394,14 +394,14 @@ export function generateDefaultPgOrmMethods(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.UNMET_BACKEND_DEPENDENCY,
-              `RxPg ORM ${object.constructor.name} pgUpdate$ method params [${c.params()}] unmet backend dependency: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${c.params()}] unmet backend dependency: `);
 
           }
 
           // Default throw
           throw new OrmError.OrmError(e,
             OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
-            `RxPg ORM ${object.constructor.name} pgUpdate$ method params [${c.params()}] unspecified backend error: `);
+            `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${c.params()}] unspecified backend error: `);
 
         }),
 
@@ -412,12 +412,12 @@ export function generateDefaultPgOrmMethods(
 
             throw new OrmError.OrmError(new Error("not found"),
               OrmError.EORMERRORCODES.NOT_FOUND,
-              `RxPg ORM ${object.constructor.name} pgUpdate$ method params [${c.params()}] not found error: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${c.params()}] not found error: `);
 
           }
 
           const r: (o: QueryResult) => any = c.returns !== undefined ?
-            c.returns : (o: QueryResult) => o
+            c.returns : (o: QueryResult) => object;
 
           return r(o);
 
@@ -434,7 +434,7 @@ export function generateDefaultPgOrmMethods(
 
     const c = config.pgDelete$;
 
-    object["pgDelete$"] = (pg: RxPg): rx.Observable<any> => {
+    (<any>object)["pgDelete$"] = (pg: RxPg): rx.Observable<any> => {
 
       return executeParamQuery$({
         pg: pg,
@@ -450,14 +450,14 @@ export function generateDefaultPgOrmMethods(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-              `RxPg ORM ${object.constructor.name} pgDelete$ method params [${c.params()}] invalid object parameters: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgDelete$ method params [${c.params()}] invalid object parameters: `);
 
           }
 
           // Default throw
           throw new OrmError.OrmError(e,
             OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
-            `RxPg ORM ${object.constructor.name} pgDelete$ method params [${c.params()}] unspecified backend error: `);
+            `RxPg ORM ${(<any>object).constructor.name} pgDelete$ method params [${c.params()}] unspecified backend error: `);
 
         }),
 
@@ -468,12 +468,12 @@ export function generateDefaultPgOrmMethods(
 
             throw new OrmError.OrmError(new Error("not found"),
               OrmError.EORMERRORCODES.NOT_FOUND,
-              `RxPg ORM ${object.constructor.name} pgDelete$ method params [${c.params()}] not found error: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgDelete$ method params [${c.params()}] not found error: `);
 
           }
 
           const r: (o: QueryResult) => any = c.returns !== undefined ?
-            c.returns : (o: QueryResult) => o
+            c.returns : (o: QueryResult) => object;
 
           return r(o);
 
@@ -701,7 +701,15 @@ export function selectMany$<T>({
         o.rows.map((r: any) => newFunction({ ...r,
           selectMany$params: { pg: pg, params: params() } }));
 
-      return rx.zip(...obs);
+      if (obs.length > 0) {
+
+        return rx.zip(...obs);
+
+      } else {
+
+        return rx.of([]);
+
+      }
 
     }),
 

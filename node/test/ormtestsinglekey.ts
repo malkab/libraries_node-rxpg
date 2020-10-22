@@ -26,9 +26,9 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
 
   // Placeholder for the required functions at the IPgPersistence interface
   // These will be created automatically by a helper at construction time
-  public pgInsert$: (pg: RxPg) => rx.Observable<any>;
-  public pgUpdate$: (pg: RxPg) => rx.Observable<any>;
-  public pgDelete$: (pg: RxPg) => rx.Observable<any>;
+  public pgInsert$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
+  public pgUpdate$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
+  public pgDelete$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
 
   /**
    *
@@ -88,7 +88,7 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
 
     }
 
-    console.log("COMPLEX INITIALIZATION LOGIC HERE", additional);
+    // console.log("COMPLEX INITIALIZATION LOGIC HERE", additional);
 
     this._a = +a;
     this._b = b;
@@ -101,7 +101,7 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       pgInsert$: {
         sql: 'insert into singlekeyobjects values ($1, $2, $3) returning *;',
         params: () => [ this.a, this.b, this.c ],
-        // returns: (o: QueryResult) => o
+        // returns: (o: QueryResult, object: OrmTestSingleKey) => "OK"
       },
       pgUpdate$: {
         sql: 'update singlekeyobjects set b=$1, c=$3 where a=$2 returning *;',
@@ -110,7 +110,7 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       },
       pgDelete$: {
         sql: 'delete from singlekeyobjects where a=$1 returning *;',
-        params: () => [ this.a ],
+        params: () => [ this.a ]
         // returns: (o: QueryResult) => o.rowCount
       }
     })
