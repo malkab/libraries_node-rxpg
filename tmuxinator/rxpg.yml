@@ -2,7 +2,7 @@ name: rxpg
 root: /home/git/malkab-libraries-node/rxpg
 
 windows:
-  - docker-dev: >
+  - rxpg/docker-dev: >
       clear ;
       sleep 7 ;
       cd docker ;

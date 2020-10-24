@@ -136,9 +136,14 @@ export class RxPg {
    * Closes the pool
    *
    */
-  public close(): void {
+  public close(): rx.Observable<boolean> {
 
-    this._pool.end();
+    return rx.from(this._pool.end())
+    .pipe(
+
+      rxo.map((o: any) => true)
+
+    )
 
   }
 

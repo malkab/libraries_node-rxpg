@@ -4,13 +4,11 @@ import { expect } from "chai";
 
 import * as rx from "rxjs";
 
-import * as rxo from "rxjs/operators";
-
 import { pg, clearDatabase$ } from "./common";
 
 import { PgOrm } from "../../src/index";
 
-import { rxMochaTests, OrmError } from "@malkab/ts-utils";
+import { rxMochaTests } from "@malkab/ts-utils";
 
 import { OrmTestSingleKey } from "../ormtestsinglekey";
 

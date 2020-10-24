@@ -13,8 +13,6 @@ Mocha testing
 `);
 
 describe("libsunnsaasbackend Tests", () => {
-  require("./tests/pgorm.test");
-  // require("./tests/analysis.test");
-  // require("./tests/dataset.test");
-  // require("./tests/analysistasks.test");
+  describe("\n\n  --- rxpg.test ---\n", () => require("./tests/rxpg.test"));
+  describe("\n\n  --- pgorm.test ---\n", () => require("./tests/pgorm.test"));
 });
