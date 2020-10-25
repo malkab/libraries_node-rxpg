@@ -558,6 +558,8 @@ export function executeParamQuery$({
  *   - the RxPg object used to connect to the DB;
  *   - the params from the params function parameter.
  *
+ * The newFunction return is any so factories can be used.
+ *
  * @returns
  * An instantiated object of class "type" with values coming from the DB.
  *
@@ -573,7 +575,7 @@ export function select$<T>({
   sql: string;
   type: any;
   params: () => any[];
-  newFunction?: (params: any) => rx.Observable<T>;
+  newFunction?: (params: any) => rx.Observable<any>;
 }): rx.Observable<T> {
 
   return pg.executeParamQuery$(
@@ -640,6 +642,8 @@ export function select$<T>({
  * statics. This function returns an array of instantiated objects of class T,
  * also defined by the object **type** passed as a param.
  *
+ * The newFunction return is any so factories can be used.
+ *
  * @param pg
  * The persistence objects and/or parameters to perform the CREATE option.
  *
@@ -686,7 +690,7 @@ export function selectMany$<T>({
   sql: string;
   type: any;
   params: () => any[];
-  newFunction?: (params: any) => rx.Observable<T>;
+  newFunction?: (params: any) => rx.Observable<any>;
 }): rx.Observable<T[]> {
 
   return pg.executeParamQuery$(

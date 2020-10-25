@@ -1,5 +1,7 @@
 # Boilerplate for Node Libraries
 
+**Doc version:** 2020-10-19
+
 This is the boilerplate to create Node libraries.
 
 
@@ -20,13 +22,17 @@ Steps:
 
 - update package **README.md** and the description at **package.json**, if applicable;
 
-- test **npm run build** or **npm run build-with-docs** (better the last one, copy resulting docs to mlk-docs);
+- check for **console.log("D:** left behind;
 
-- test **npm pack**;
+- test **yarn build** or **yarn build-with-docs** (better the last one, copy resulting docs to mlk-docs);
+
+- test **yarn pack**;
 
 - review changes with Git to get a clear idea of changes in the current version, but don't commit yet;
 
-- test **npm publish**, changing version with **npm version** if needed;
+- if for TGZ inter-repo deployment, use **yarn distribute-pack**;
+
+- test **yarn publish**, changing version with **yarn version** if needed. Start new projects always at **version 1.0.0** and start working on it at the fix number no matter what the changes are. **0 or odd** minor versions means developing versions, never go out of that until it is considered stable, at which point move to an **even** minor version number and make fixes to that. Only change major version changes on truly backward incompatible changes. **LET THE CODE MATURE BEFORE COMITTING EVEN VERSION NUMBERS**;
 
 - close the Git Flow feature and go back to **develop**, if any. Get a clear idea of changes in the current version;
 
