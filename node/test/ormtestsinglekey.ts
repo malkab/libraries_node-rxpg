@@ -26,9 +26,12 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
 
   // Placeholder for the required functions at the IPgPersistence interface
   // These will be created automatically by a helper at construction time
-  public pgInsert$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
-  public pgUpdate$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
-  public pgDelete$: (pg: RxPg) => rx.Observable<OrmTestSingleKey>;
+  public pgInsert$: (pg: RxPg) => rx.Observable<OrmTestSingleKey> =
+    (pg: RxPg) => rx.of(this);
+  public pgUpdate$: (pg: RxPg) => rx.Observable<OrmTestSingleKey> =
+    (pg: RxPg) => rx.of(this);
+  public pgDelete$: (pg: RxPg) => rx.Observable<OrmTestSingleKey> =
+    (pg: RxPg) => rx.of(this);
 
   /**
    *
