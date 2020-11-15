@@ -13,7 +13,10 @@ export const pg: RxPg = new RxPg({
   applicationName: "test-libsunnsaasbackend",
   db: "postgres",
   host: "postgis",
-  pass: "postgres"
+  pass: "postgres",
+  maxPoolSize: 20,
+  minPoolSize: 20,
+  idleTimeoutMillis: 0
 });
 
 /**

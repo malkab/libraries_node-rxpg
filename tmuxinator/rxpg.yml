@@ -13,7 +13,7 @@ windows:
       sleep 4 ;
       cd docker ;
       . mlkcontext common ;
-      ./030_docker_postgis_psql.sh
+      ./100_docker_postgis_psql.sh
   - docker-pg: >
       clear ;
       sleep 0.5 ;

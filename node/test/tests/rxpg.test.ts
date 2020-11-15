@@ -6,9 +6,34 @@ import * as rx from "rxjs";
 
 import { pg, clearDatabase$ } from "./common";
 
-import { QueryResult } from "../../src/index";
+import { QueryResult, EPGERRORCODES } from "../../src/index";
 
 import { rxMochaTests } from "@malkab/ts-utils";
+
+/**
+ *
+ * Clear database.
+ *
+ */
+describe("Clear database", function() {
+
+  rxMochaTests({
+
+    testCaseName: "Clear database",
+
+    observables: [ clearDatabase$ ],
+
+    assertions: [
+
+      (o: boolean) => expect(o).to.be.true
+
+    ],
+
+    verbose: false
+
+  })
+
+})
 
 /**
  *
@@ -21,19 +46,49 @@ describe("Open and close the connection", function() {
 
     testCaseName: "Open and close the connection",
 
-    observable: rx.concat(
-
-      clearDatabase$,
-
-      pg.executeQuery$(`select 44 as x;`)
-
-    ),
+    observables: [
+      pg.executeQuery$(`select 44 as x;`),
+      // rx.of(pg.totalConnections),
+      // rx.of(pg.waitingConnections),
+      pg.connectionReport()
+    ],
 
     assertions: [
 
-      (o: boolean) => expect(o).to.be.true,
+      (o: QueryResult) => expect(o.rows[0].x).to.be.equal(44),
+      (o: any) => console.log("D: kkke", o)
 
-      (o: QueryResult) => expect(o.rows[0].x).to.be.equal(44)
+    ],
+
+    verbose: false
+
+  })
+
+})
+
+/**
+ *
+ * Stress the connection.
+ *
+ */
+describe("Stress the connection", function() {
+
+  rxMochaTests({
+
+    testCaseName: "Stress the connection",
+
+    observables: [ rx.zip(
+      ...Array.from(Array(10).keys()).map(o =>
+        pg.executeQuery$(`select 44 as x;`)
+      )
+    ) ],
+
+    assertions: [
+
+      (o: any) => {
+        expect(o.code).to.be.equal(EPGERRORCODES.too_many_clients);
+        expect(o.message).to.be.equal("sorry, too many clients already");
+      }
 
     ],
 

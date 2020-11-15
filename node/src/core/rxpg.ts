@@ -157,6 +157,7 @@ export class RxPg {
     let _client: any = null;
 
     return new rx.Observable<QueryResult>((o: any) => {
+
       this._pool.connect()
       .then((client: any) => {
 

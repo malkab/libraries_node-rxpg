@@ -23,7 +23,7 @@ describe("Check lists when they are empty", function() {
 
     testCaseName: "Check lists when they are empty",
 
-    observable: rx.concat(
+    observables: [ rx.concat(
 
       clearDatabase$,
 
@@ -36,7 +36,7 @@ describe("Check lists when they are empty", function() {
 
       })
 
-    ),
+    ) ],
 
     assertions: [
 
@@ -69,7 +69,7 @@ describe("Check lists when they have elements", function() {
 
     testCaseName: "Check lists when they have elements",
 
-    observable: rx.concat(
+    observables: [ rx.concat(
 
       clearDatabase$,
 
@@ -86,7 +86,7 @@ describe("Check lists when they have elements", function() {
 
       })
 
-    ),
+    ) ],
 
     assertions: [
 
