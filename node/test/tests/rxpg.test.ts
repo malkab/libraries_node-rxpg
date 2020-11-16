@@ -37,26 +37,35 @@ describe("Clear database", function() {
 
 /**
  *
- * Open and close the connection.
+ * Check connection status, unstressed.
  *
  */
-describe("Open and close the connection", function() {
+describe("Check connection status, unstressed", function() {
 
   rxMochaTests({
 
-    testCaseName: "Open and close the connection",
+    testCaseName: "Check connection status, unstressed",
 
     observables: [
       pg.executeQuery$(`select 44 as x;`),
-      // rx.of(pg.totalConnections),
-      // rx.of(pg.waitingConnections),
       pg.connectionReport()
     ],
 
     assertions: [
 
       (o: QueryResult) => expect(o.rows[0].x).to.be.equal(44),
-      (o: any) => console.log("D: kkke", o)
+      (o: any) => {
+
+        expect(o.totalConnections, "totalConnections").to.be.equal(5);
+        expect(o.totalConnections, "idleConnections").to.be.equal(5);
+        expect(o.totalConnections, "waitingConnections").to.be.equal(5);
+        expect(o.totalConnections, "numberClients").to.be.equal(5);
+        expect(o.totalConnections, "maxConnections").to.be.equal(5);
+        expect(o.totalConnections, "connectionsToDb").to.be.equal(5);
+        expect(o.totalConnections, "clientsByApps").to.be.equal(5);
+        expect(o.totalConnections, "clients").to.be.equal(5);
+
+      }
 
     ],
 
@@ -77,17 +86,31 @@ describe("Stress the connection", function() {
 
     testCaseName: "Stress the connection",
 
-    observables: [ rx.zip(
-      ...Array.from(Array(10).keys()).map(o =>
-        pg.executeQuery$(`select 44 as x;`)
-      )
-    ) ],
+    observables: [
+      rx.zip(
+        ...Array.from(Array(210).keys()).map(o =>
+          pg.executeQuery$(`select 44 as x;`)
+      )),
+      pg.connectionReport()
+    ],
 
     assertions: [
 
       (o: any) => {
         expect(o.code).to.be.equal(EPGERRORCODES.too_many_clients);
         expect(o.message).to.be.equal("sorry, too many clients already");
+      },
+      (o: any) => {
+
+        expect(o.totalConnections, "totalConnections").to.be.equal(199);
+        expect(o.totalConnections, "idleConnections").to.be.equal(199);
+        expect(o.totalConnections, "waitingConnections").to.be.equal(199);
+        expect(o.totalConnections, "numberClients").to.be.equal(199);
+        expect(o.totalConnections, "maxConnections").to.be.equal(199);
+        expect(o.totalConnections, "connectionsToDb").to.be.equal(199);
+        expect(o.totalConnections, "clientsByApps").to.be.equal(199);
+        expect(o.totalConnections, "clients").to.be.equal(199);
+
       }
 
     ],

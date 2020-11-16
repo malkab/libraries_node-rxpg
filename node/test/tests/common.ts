@@ -14,8 +14,8 @@ export const pg: RxPg = new RxPg({
   db: "postgres",
   host: "postgis",
   pass: "postgres",
-  maxPoolSize: 20,
-  minPoolSize: 20,
+  maxPoolSize: 200,
+  minPoolSize: 200,
   idleTimeoutMillis: 0
 });
 
