@@ -14,8 +14,18 @@ export const pg: RxPg = new RxPg({
   db: "postgres",
   host: "postgis",
   pass: "postgres",
-  maxPoolSize: 200,
-  minPoolSize: 200,
+  maxPoolSize: 150,
+  minPoolSize: 150,
+  idleTimeoutMillis: 0
+});
+
+export const pgTooManyConnections: RxPg = new RxPg({
+  applicationName: "test-libsunnsaasbackend",
+  db: "postgres",
+  host: "postgis",
+  pass: "postgres",
+  maxPoolSize: 2000,
+  minPoolSize: 2000,
   idleTimeoutMillis: 0
 });
 

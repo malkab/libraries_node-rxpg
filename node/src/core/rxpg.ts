@@ -488,4 +488,24 @@ export class RxPg {
 
   }
 
+  /**
+   *
+   * Test connections. Tries to open the maximum allowed connections for this
+   * pool to check if the database allows or reject them.
+   *
+   */
+  public testMaxConnections$(): rx.Observable<boolean> {
+
+    return rx.zip(
+      ...Array.from(Array(this._maxPoolSize).keys()).map(o =>
+        this.executeQuery$(`select 'RxPg testMaxConnections' as x;`)
+      ))
+    .pipe(
+
+      rxo.map((o: any) => o.length === this._maxPoolSize)
+
+    )
+
+  }
+
 }

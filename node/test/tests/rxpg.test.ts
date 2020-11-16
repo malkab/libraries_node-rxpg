@@ -2,9 +2,7 @@ import "mocha";
 
 import { expect } from "chai";
 
-import * as rx from "rxjs";
-
-import { pg, clearDatabase$ } from "./common";
+import { pg, clearDatabase$, pgTooManyConnections } from "./common";
 
 import { QueryResult, EPGERRORCODES } from "../../src/index";
 
@@ -77,6 +75,48 @@ describe("Check connection status, unstressed", function() {
 
 /**
  *
+ * Test max connections.
+ *
+ */
+describe("Test max connections", function() {
+
+  rxMochaTests({
+
+    testCaseName: "Test max connections",
+
+    observables: [
+      pg.testMaxConnections$(),
+      pg.connectionReport()
+    ],
+
+    assertions: [
+
+      (o: boolean) => {
+        expect(o).to.be.true
+      },
+      (o: any) => {
+
+        expect(o.totalConnections, "totalConnections").to.be.lessThan(155);
+        expect(o.totalConnections, "idleConnections").to.be.lessThan(155);
+        expect(o.totalConnections, "waitingConnections").to.be.lessThan(155);
+        expect(o.totalConnections, "numberClients").to.be.lessThan(155);
+        expect(o.totalConnections, "maxConnections").to.be.lessThan(155);
+        expect(o.totalConnections, "connectionsToDb").to.be.lessThan(155);
+        expect(o.totalConnections, "clientsByApps").to.be.lessThan(155);
+        expect(o.totalConnections, "clients").to.be.lessThan(155);
+
+      }
+
+    ],
+
+    verbose: false
+
+  })
+
+})
+
+/**
+ *
  * Stress the connection.
  *
  */
@@ -87,11 +127,7 @@ describe("Stress the connection", function() {
     testCaseName: "Stress the connection",
 
     observables: [
-      rx.zip(
-        ...Array.from(Array(210).keys()).map(o =>
-          pg.executeQuery$(`select 44 as x;`)
-      )),
-      pg.connectionReport()
+      pgTooManyConnections.testMaxConnections$()
     ],
 
     assertions: [
@@ -99,18 +135,6 @@ describe("Stress the connection", function() {
       (o: any) => {
         expect(o.code).to.be.equal(EPGERRORCODES.too_many_clients);
         expect(o.message).to.be.equal("sorry, too many clients already");
-      },
-      (o: any) => {
-
-        expect(o.totalConnections, "totalConnections").to.be.equal(199);
-        expect(o.totalConnections, "idleConnections").to.be.equal(199);
-        expect(o.totalConnections, "waitingConnections").to.be.equal(199);
-        expect(o.totalConnections, "numberClients").to.be.equal(199);
-        expect(o.totalConnections, "maxConnections").to.be.equal(199);
-        expect(o.totalConnections, "connectionsToDb").to.be.equal(199);
-        expect(o.totalConnections, "clientsByApps").to.be.equal(199);
-        expect(o.totalConnections, "clients").to.be.equal(199);
-
       }
 
     ],
