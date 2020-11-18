@@ -90,12 +90,12 @@ export class RxPg {
   }) {
 
     this._host = host;
-    this._port = port;
+    this._port = +port;
     this._user = user;
     this._password = pass;
     this._database = db;
-    this._maxPoolSize = maxPoolSize;
-    this._minPoolSize = minPoolSize;
+    this._maxPoolSize = +maxPoolSize;
+    this._minPoolSize = +minPoolSize;
 
     if (applicationName) {
 
@@ -107,7 +107,7 @@ export class RxPg {
 
     }
 
-    this._idleTimeoutMillis = idleTimeoutMillis;
+    this._idleTimeoutMillis = +idleTimeoutMillis;
 
     this._pool = new Pool(this.poolConfig);
 
