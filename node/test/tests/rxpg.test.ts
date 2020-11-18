@@ -46,7 +46,7 @@ describe("Check connection status, unstressed", function() {
 
     observables: [
       pg.executeQuery$(`select 44 as x;`),
-      pg.connectionReport()
+      pg.connectionReport$()
     ],
 
     assertions: [
@@ -86,7 +86,7 @@ describe("Test max connections", function() {
 
     observables: [
       pg.testMaxConnections$(),
-      pg.connectionReport()
+      pg.connectionReport$()
     ],
 
     assertions: [

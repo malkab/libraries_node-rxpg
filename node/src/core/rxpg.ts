@@ -1,8 +1,8 @@
-import * as rx from "rxjs";
-
-import { PoolConfig, Pool, QueryResult } from "pg";
-
 import * as fs from "fs";
+
+import { Pool, PoolConfig, QueryResult } from "pg";
+
+import * as rx from "rxjs";
 
 import * as rxo from "rxjs/operators";
 
@@ -136,7 +136,7 @@ export class RxPg {
    * Closes the pool
    *
    */
-  public close(): rx.Observable<boolean> {
+  public close$(): rx.Observable<boolean> {
 
     return rx.from(this._pool.end())
     .pipe(
@@ -238,40 +238,28 @@ export class RxPg {
    * Return number of connections at the pool.
    *
    */
-  get totalConnections(): number {
-
-    return this._pool.totalCount;
-
-  }
+  get totalConnections(): number { return this._pool.totalCount; }
 
   /**
    *
    * Return number of idle connections at the pool.
    *
    */
-  get idleConnections(): number {
-
-    return this._pool.idleCount;
-
-  }
+  get idleConnections(): number { return this._pool.idleCount; }
 
   /**
    *
-   * Return number of idle connections at the pool.
+   * Return number of waiting connections at the pool.
    *
    */
-  get waitingConnections(): number {
-
-    return this._pool.waitingCount;
-
-  }
+  get waitingConnections(): number { return this._pool.waitingCount; }
 
   /**
    *
    * Return the list of clients connected to the database.
    *
    */
-  public getClients(): rx.Observable<any[]> {
+  public getClients$(): rx.Observable<any[]> {
 
     return this.executeQuery$(`
       select
@@ -304,7 +292,7 @@ export class RxPg {
    * Return the number of clients connected to the database.
    *
    */
-  public getNumberClients(): rx.Observable<number> {
+  public getNumberClients$(): rx.Observable<number> {
 
     return this.executeQuery$(`
       select
@@ -336,7 +324,10 @@ export class RxPg {
    * Return the number of clients for each app.
    *
    */
-  public getAppClients(): rx.Observable<any[]> {
+  public getAppClients$(): rx.Observable<{
+    appName: string;
+    clients: number;
+  }[]> {
 
     return this.executeQuery$(`
       select
@@ -370,7 +361,7 @@ export class RxPg {
    * Return max connections to the database.
    *
    */
-  public getMaxConnections(): rx.Observable<number> {
+  public getMaxConnections$(): rx.Observable<number> {
 
     return this.executeQuery$(`
       show max_connections;
@@ -392,7 +383,7 @@ export class RxPg {
    * Return connections to each database.
    *
    */
-  public getConnectionsToDb(): rx.Observable<any[]> {
+  public getConnectionsToDb$(): rx.Observable<any[]> {
 
     return this.executeQuery$(`
       select
@@ -417,15 +408,35 @@ export class RxPg {
    *
    * Returns a report of connection status to the server.
    *
+   * @returns
+   * A data structure with the following items:
+   * - totalConnections: total connections in the pool (a number)
+   * - idleConnections: total idle connections in the pool (a number)
+   * - waitingConnections: total waiting connections in the pool (a number)
+   * - numberClients: total number of clients connected to the DB (a number)
+   * - maxConnections: total connections supported by the DB (a number)
+   * - connectionsToDb: number of connections to each DB (a list of databases, small)
+   * - clientsByApps: list of number of connections by application name (a small list)
+   * - clients: list of clients connected to the DB (can be really large)
+   *
    */
-  public connectionReport(): rx.Observable<any> {
+  public connectionReport$(): rx.Observable<{
+    totalConnections: number;
+    idleConnections: number;
+    waitingConnections: number;
+    numberClients: number;
+    maxConnections: number;
+    connectionsToDb: any[];
+    clientsByApps: any[];
+    clients: any[];
+  }> {
 
     return rx.zip(
-      this.getNumberClients(),
-      this.getMaxConnections(),
-      this.getConnectionsToDb(),
-      this.getAppClients(),
-      this.getClients()
+      this.getNumberClients$(),
+      this.getMaxConnections$(),
+      this.getConnectionsToDb$(),
+      this.getAppClients$(),
+      this.getClients$()
     )
     .pipe(
 
@@ -455,7 +466,7 @@ export class RxPg {
    * Returns the size of all databases.
    *
    */
-  public getDatabaseSizes(): rx.Observable<any> {
+  public getDatabaseSizes$(): rx.Observable<any> {
 
     return this.executeQuery$(`
       select
