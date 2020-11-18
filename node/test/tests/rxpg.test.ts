@@ -92,7 +92,8 @@ describe("Test max connections", function() {
     assertions: [
 
       (o: boolean) => {
-        expect(o).to.be.true
+        expect(o).to.be.deep
+          .equal({ attempted: 150, max: 150, withoutError: 150 })
       },
       (o: any) => {
 

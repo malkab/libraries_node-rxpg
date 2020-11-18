@@ -493,8 +493,17 @@ export class RxPg {
    * Test connections. Tries to open the maximum allowed connections for this
    * pool to check if the database allows or reject them.
    *
+   * @returns
+   * An object with the following members:
+   * - max: this pool max size
+   * - attempted: the number of simultaneous connections attempted
+   * - withoutError: the number of those connections returning without an error
+   *
+   * They should be the same.
+   *
    */
-  public testMaxConnections$(): rx.Observable<boolean> {
+  public testMaxConnections$(): rx.Observable<{
+    attempted: number, max: number, withoutError: number }> {
 
     return rx.zip(
       ...Array.from(Array(this._maxPoolSize).keys()).map(o =>
@@ -502,7 +511,12 @@ export class RxPg {
       ))
     .pipe(
 
-      rxo.map((o: any) => o.length === this._maxPoolSize)
+      rxo.map((o: any) => {
+
+        return { max: this._maxPoolSize, attempted: o.length,
+          withoutError: o.filter((o: any) => o.command === "SELECT").length }
+
+      })
 
     )
 
