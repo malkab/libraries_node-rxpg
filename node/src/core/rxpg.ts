@@ -174,12 +174,7 @@ export class RxPg {
       })
       .catch((error: any) => {
 
-        if (_client) {
-
-          _client.release();
-
-        }
-
+        if (_client) _client.release();
         o.error(error);
 
       });
@@ -219,12 +214,7 @@ export class RxPg {
       })
       .catch((error: any) => {
 
-        if (_client) {
-
-          _client.release();
-
-        }
-
+        if (_client) _client.release();
         o.error(error);
 
       });
@@ -277,11 +267,7 @@ export class RxPg {
     `)
     .pipe(
 
-      rxo.map((x: QueryResult) => {
-
-        return x.rows;
-
-      })
+      rxo.map((x: QueryResult) => x.rows)
 
     )
 
@@ -309,11 +295,7 @@ export class RxPg {
     `)
     .pipe(
 
-      rxo.map((x: QueryResult) => {
-
-        return x.rowCount;
-
-      })
+      rxo.map((x: QueryResult) => x.rowCount)
 
     );
 
@@ -368,11 +350,7 @@ export class RxPg {
     `)
     .pipe(
 
-      rxo.map((x: QueryResult) => {
-
-        return +x.rows[0]["max_connections"];
-
-      })
+      rxo.map((x: QueryResult) => +x.rows[0]["max_connections"])
 
     );
 
@@ -394,11 +372,7 @@ export class RxPg {
     `)
     .pipe(
 
-      rxo.map((x: QueryResult) => {
-
-        return x.rows;
-
-      })
+      rxo.map((x: QueryResult) => x.rows)
 
     );
 
