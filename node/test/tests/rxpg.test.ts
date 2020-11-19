@@ -45,7 +45,7 @@ describe("Check connection status, unstressed", function() {
     testCaseName: "Check connection status, unstressed",
 
     observables: [
-      pg.executeQuery$(`select 44 as x;`),
+      pg.executeParamQuery$(`select 44 as x;`),
       pg.connectionReport$()
     ],
 

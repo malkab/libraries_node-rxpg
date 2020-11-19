@@ -76,7 +76,11 @@ export class RxPg {
     maxPoolSize=10,
     minPoolSize=3,
     applicationName,
-    idleTimeoutMillis=10000
+    idleTimeoutMillis=10000,
+    onConnectEvent = undefined,
+    onAcquireEvent = undefined,
+    onErrorEvent = undefined,
+    onRemoveEvent = undefined
   }: {
     host?: string;
     port?: number;
@@ -87,6 +91,10 @@ export class RxPg {
     minPoolSize?: number;
     applicationName?: string;
     idleTimeoutMillis?: number;
+    onConnectEvent?: (client: any) => void;
+    onAcquireEvent?: (client: any) => void;
+    onErrorEvent?: (err: Error, client: any) => void;
+    onRemoveEvent?: (client: any) => void
   }) {
 
     this._host = host;
@@ -108,14 +116,12 @@ export class RxPg {
     }
 
     this._idleTimeoutMillis = +idleTimeoutMillis;
-
     this._pool = new Pool(this.poolConfig);
 
-    this._pool.on("error", (error: any) => {
-
-      throw error;
-
-    });
+    if (onConnectEvent) this._pool.on("connect", onConnectEvent);
+    if (onAcquireEvent) this._pool.on("acquire", onAcquireEvent);
+    if (onRemoveEvent) this._pool.on("remove", onRemoveEvent);
+    if (onErrorEvent) this._pool.on("error", onErrorEvent);
 
   }
 
@@ -127,7 +133,7 @@ export class RxPg {
   public executeScript$(file: string): rx.Observable<QueryResult> {
 
     const script = fs.readFileSync(file).toString();
-    return this.executeQuery$(script);
+    return this.executeParamQuery$(script);
 
   }
 
@@ -149,77 +155,31 @@ export class RxPg {
 
   /**
    *
-   * Executes an arbitrary query
-   *
-   */
-  public executeQuery$(query: string): rx.Observable<QueryResult> {
-
-    let _client: any = null;
-
-    return new rx.Observable<QueryResult>((o: any) => {
-
-      this._pool.connect()
-      .then((client: any) => {
-
-        _client = client;
-        return _client.query(query);
-
-      })
-      .then((res: any) => {
-
-        _client.release();
-        o.next(res);
-        o.complete();
-
-      })
-      .catch((error: any) => {
-
-        if (_client) _client.release();
-        o.error(error);
-
-      });
-
-    });
-
-  }
-
-  /**
-   *
    * Executes an arbitrary parametrized query
    *
    * query: tag parameters with $X, where X is a correlative number
    * values: a list
    *
    */
-  public executeParamQuery$(query: string, values: any):
-  rx.Observable<QueryResult> {
-
-    let _client: any = null;
+  public executeParamQuery$(query: string, params?: any): rx.Observable<QueryResult> {
 
     return new rx.Observable<QueryResult>((o: any) => {
 
-      this._pool.connect()
-      .then((client: any) => {
+      this._pool.query(query, params)
+      .then((queryResult: QueryResult) => {
 
-        _client = client;
-        return _client.query(query, values);
-
-      })
-      .then((res: any) => {
-
-        _client.release();
-        o.next(res);
+        o.next(queryResult);
         o.complete();
 
       })
       .catch((error: any) => {
 
-        if (_client) _client.release();
         o.error(error);
+        o.complete();
 
-      });
+      })
 
-    });
+    })
 
   }
 
@@ -251,7 +211,7 @@ export class RxPg {
    */
   public getClients$(): rx.Observable<any[]> {
 
-    return this.executeQuery$(`
+    return this.executeParamQuery$(`
       select
         pid as "processId",
         usename as "userName",
@@ -280,7 +240,7 @@ export class RxPg {
    */
   public getNumberClients$(): rx.Observable<number> {
 
-    return this.executeQuery$(`
+    return this.executeParamQuery$(`
       select
         pid as process_id,
         usename as username,
@@ -311,7 +271,7 @@ export class RxPg {
     clients: number;
   }[]> {
 
-    return this.executeQuery$(`
+    return this.executeParamQuery$(`
       select
         application_name as "appName",
         count(*) as "clients"
@@ -345,7 +305,7 @@ export class RxPg {
    */
   public getMaxConnections$(): rx.Observable<number> {
 
-    return this.executeQuery$(`
+    return this.executeParamQuery$(`
       show max_connections;
     `)
     .pipe(
@@ -363,7 +323,7 @@ export class RxPg {
    */
   public getConnectionsToDb$(): rx.Observable<any[]> {
 
-    return this.executeQuery$(`
+    return this.executeParamQuery$(`
       select
         datname as "databaseName",
         numbackends as "numBackends"
@@ -442,7 +402,7 @@ export class RxPg {
    */
   public getDatabaseSizes$(): rx.Observable<any> {
 
-    return this.executeQuery$(`
+    return this.executeParamQuery$(`
       select
         a as "databaseName",
         pg_size_pretty(pg_database_size(a)) as "prettySize",
@@ -492,7 +452,7 @@ export class RxPg {
 
     return rx.zip(
       ...Array.from(Array(this._maxPoolSize).keys()).map(o =>
-        this.executeQuery$(`select 'RxPg testMaxConnections' as x;`)
+        this.executeParamQuery$(`select 'RxPg testMaxConnections' as x;`)
       ))
     .pipe(
 

@@ -16,7 +16,11 @@ export const pg: RxPg = new RxPg({
   pass: "postgres",
   maxPoolSize: 150,
   minPoolSize: 150,
-  idleTimeoutMillis: 0
+  idleTimeoutMillis: 0,
+  // onConnectEvent: (client: any) => console.log("D: CONNECT"),
+  // onAcquireEvent: (client: any) => console.log("D: ACQUIRE"),
+  // onRemoveEvent: (client: any) => console.log("D: REMOVE"),
+  onErrorEvent: (err: Error) => console.log("D: ERROR", err)
 });
 
 export const pgTooManyConnections: RxPg = new RxPg({
