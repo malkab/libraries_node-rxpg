@@ -121,7 +121,19 @@ export class RxPg {
     if (onConnectEvent) this._pool.on("connect", onConnectEvent);
     if (onAcquireEvent) this._pool.on("acquire", onAcquireEvent);
     if (onRemoveEvent) this._pool.on("remove", onRemoveEvent);
-    if (onErrorEvent) this._pool.on("error", onErrorEvent);
+    if (onErrorEvent) {
+
+      this._pool.on("error", onErrorEvent);
+
+    } else {
+
+      this._pool.on("error", (error: any) => {
+
+        throw error;
+
+      });
+
+    }
 
   }
 

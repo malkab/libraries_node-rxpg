@@ -1,6 +1,6 @@
 {
   "name": "@malkab/rxpg",
-  "version": "4.1.11",
+  "version": "4.1.12",
   "description": "A RxJS PostgreSQL interface.",
   "scope": "@malkab",
   "author": {
