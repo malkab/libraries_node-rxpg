@@ -306,11 +306,7 @@ export function generateDefaultPgOrmMethods<T>(
 
     (<any>object)["pgInsert$"] = (pg: RxPg): rx.Observable<T> => {
 
-      return executeParamQuery$({
-        pg: pg,
-        sql: c.sql,
-        params: c.params
-      })
+      return executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
       .pipe(
 
         rxo.catchError((e: Error) => {
@@ -371,11 +367,7 @@ export function generateDefaultPgOrmMethods<T>(
 
     (<any>object)["pgUpdate$"] = (pg: RxPg): rx.Observable<T> => {
 
-      return executeParamQuery$({
-        pg: pg,
-        sql: c.sql,
-        params: c.params
-      })
+      return executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
       .pipe(
 
         rxo.catchError((e: Error) => {
@@ -436,11 +428,7 @@ export function generateDefaultPgOrmMethods<T>(
 
     (<any>object)["pgDelete$"] = (pg: RxPg): rx.Observable<any> => {
 
-      return executeParamQuery$({
-        pg: pg,
-        sql: c.sql,
-        params: c.params
-      })
+      return executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
       .pipe(
 
         rxo.catchError((e: Error) => {
@@ -507,7 +495,8 @@ export function executeParamQuery$({
   returns?: (results: QueryResult) => any;
 }): rx.Observable<any> {
 
-  return pg.executeParamQuery$(sql, params())
+  return pg.executeParamQuery$(sql, {
+    params: params(), nullAsUndefined: true })
   .pipe(
 
     // Return true if successfull
@@ -578,10 +567,9 @@ export function select$<T>({
   newFunction?: (params: any) => rx.Observable<any>;
 }): rx.Observable<T> {
 
-  return pg.executeParamQuery$(
-    sql,
-    params()
-  ).pipe(
+  return pg.executeParamQuery$( sql, {
+    params: params(), nullAsUndefined: true })
+  .pipe(
 
     rxo.concatMap((o: QueryResult) => {
 
@@ -693,10 +681,8 @@ export function selectMany$<T>({
   newFunction?: (params: any) => rx.Observable<any>;
 }): rx.Observable<T[]> {
 
-  return pg.executeParamQuery$(
-    sql,
-    params()
-  )
+  return pg.executeParamQuery$(sql, {
+    params: params(), nullAsUndefined: true })
   .pipe(
 
     rxo.concatMap((o: QueryResult) => {

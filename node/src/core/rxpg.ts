@@ -167,18 +167,45 @@ export class RxPg {
 
   /**
    *
-   * Executes an arbitrary parametrized query
+   * Executes an arbitrary parametrized query. By default, null database values
+   * are returned as **null**, but this is sometimes very inconvenient, for
+   * example, for ORM operations with deconstructed parameters. The option
+   * nullAsUndefined transforms nulls coming from the DB into undefined.
    *
-   * query: tag parameters with $X, where X is a correlative number
-   * values: a list
+   * @param query
+   * The query to be executed.
+   *
+   * @param options
+   * Two options are available:
+   * - **params:** parameters for the query
+   * - **nullAsUndefined:** transforms nulls coming from the DB into undefined
    *
    */
-  public executeParamQuery$(query: string, params?: any): rx.Observable<QueryResult> {
+  public executeParamQuery$(
+    query: string,
+    {
+      params = undefined,
+      nullAsUndefined = false
+    }: {
+      params?: any[],
+      nullAsUndefined?: boolean
+    } = {}
+  ): rx.Observable<QueryResult> {
 
     return new rx.Observable<QueryResult>((o: any) => {
 
       this._pool.query(query, params)
       .then((queryResult: QueryResult) => {
+
+        if (nullAsUndefined) {
+
+          queryResult.rows.map((o: any) => {
+
+            Object.keys(o).map((k: string) => o[k] = o[k] ? o[k] : undefined)
+
+          })
+
+        }
 
         o.next(queryResult);
         o.complete();

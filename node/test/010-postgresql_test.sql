@@ -1,6 +1,7 @@
 /**
 
-  Initializes the database for testing.
+  Initializes the database for testing. KEEP IT HERE SINCE IT IS USED BY THE
+  CLEAR DATABASE ACTION IN TESTS.
 
 */
 begin;
@@ -38,5 +39,14 @@ create table dualkeyobjects(
 alter table dualkeyobjects
 add constraint dualkeyobject_pkey
 primary key(a, b);
+
+drop table if exists test_null_undefined;
+
+create table test_null_undefined(
+  null_integer integer,
+  null_varchar varchar,
+  undefined_integer integer,
+  undefined_varchar varchar
+);
 
 commit;

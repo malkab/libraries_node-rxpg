@@ -145,3 +145,51 @@ describe("Stress the connection", function() {
   })
 
 })
+
+/**
+ *
+ * Test undefined and null.
+ *
+ */
+describe("Test undefined and null", function() {
+
+  rxMochaTests({
+
+    testCaseName: "Test undefined and null",
+
+    observables: [
+
+      pg.executeParamQuery$(`
+        insert into test_null_undefined
+        values ($1, $2, $3, $4);
+      `, {
+        params: [ null, null, undefined, undefined ],
+      }),
+
+      pg.executeParamQuery$(`
+        select * from test_null_undefined;`,
+        { nullAsUndefined: true })
+
+    ],
+
+    assertions: [
+
+      (o: QueryResult) =>
+        expect(o.command, "insert of null and undefined")
+          .to.be.equal("INSERT"),
+
+      (o: QueryResult) =>
+        expect(o.rows[0], "Check undefined").to.be.deep.equal({
+          null_integer: undefined,
+          null_varchar: undefined,
+          undefined_integer: undefined,
+          undefined_varchar: undefined
+        })
+
+    ],
+
+    verbose: false
+
+  })
+
+})
