@@ -175,7 +175,7 @@ export class RxPg {
    * @param query
    * The query to be executed.
    *
-   * @param options
+   * @param __namedParameters
    * Two options are available:
    * - **params:** parameters for the query
    * - **nullAsUndefined:** transforms nulls coming from the DB into undefined
@@ -184,7 +184,7 @@ export class RxPg {
   public executeParamQuery$(
     query: string,
     {
-      params = undefined,
+      params,
       nullAsUndefined = false
     }: {
       params?: any[],
