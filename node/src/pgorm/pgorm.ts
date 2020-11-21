@@ -307,9 +307,6 @@ export function generateDefaultPgOrmMethods<T>(
 
     const c = config.pgInsert$;
 
-    // Modify SQL adding the RETURNING
-    const sql = `${c.sql.replace(/;+$/, "")} returning *;`;
-
     // Generate a default preprocessing and returns function
     const preprocessing: (object: T) => rx.Observable<any> =
       c.preprocessing ? c.preprocessing : (object: T) => rx.of(object);
@@ -324,7 +321,7 @@ export function generateDefaultPgOrmMethods<T>(
       .pipe(
 
         rxo.concatMap((o: any) =>
-          executeParamQuery$({ pg: pg, sql: sql, params: c.params })
+          executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
         ),
 
         rxo.catchError((e: Error) => {
@@ -376,9 +373,6 @@ export function generateDefaultPgOrmMethods<T>(
 
     const c = config.pgUpdate$;
 
-    // Modify SQL adding the RETURNING
-    const sql = `${c.sql.replace(/;+$/, "")} returning *;`;
-
     // Generate a default preprocessing and returns function
     const preprocessing: (object: T) => rx.Observable<any> =
       c.preprocessing ? c.preprocessing : (object: T) => rx.of(object);
@@ -393,7 +387,7 @@ export function generateDefaultPgOrmMethods<T>(
       .pipe(
 
         rxo.concatMap((o: any) =>
-          executeParamQuery$({ pg: pg, sql: sql, params: c.params })
+          executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
         ),
 
         rxo.catchError((e: Error) => {
@@ -449,9 +443,6 @@ export function generateDefaultPgOrmMethods<T>(
 
     const c = config.pgDelete$;
 
-    // Modify SQL adding the RETURNING
-    const sql = `${c.sql.replace(/;+$/, "")} returning *;`;
-
     // Generate a default preprocessing and returns function
     const preprocessing: (object: T) => rx.Observable<any> =
       c.preprocessing ? c.preprocessing : (object: T) => rx.of(object);
@@ -466,7 +457,7 @@ export function generateDefaultPgOrmMethods<T>(
       .pipe(
 
         rxo.concatMap((o: any) =>
-          executeParamQuery$({ pg: pg, sql: sql, params: c.params })
+          executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
         ),
 
         rxo.catchError((e: Error) => {

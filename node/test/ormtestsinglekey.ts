@@ -108,7 +108,8 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
           return rx.of(object);
 
         },
-        sql: 'insert into singlekeyobjects values ($1, $2, $3);',
+        sql: `insert into singlekeyobjects values ($1, $2, $3);
+        `,
         params: () => [ this.a, this.b, this.c ],
         returns: (o: QueryResult, object: OrmTestSingleKey) => {
 
