@@ -583,13 +583,13 @@ export function select$<T>({
   pg,
   sql,
   type,
-  params,
+  params = () => [],
   newFunction = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
-  params: () => any[];
+  params?: () => any[];
   newFunction?: (params: any) => rx.Observable<any>;
 }): rx.Observable<T> {
 
@@ -697,13 +697,13 @@ export function selectMany$<T>({
   pg,
   sql,
   type,
-  params,
+  params = () => [],
   newFunction = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
-  params: () => any[];
+  params?: () => any[];
   newFunction?: (params: any) => rx.Observable<any>;
 }): rx.Observable<T[]> {
 
