@@ -251,9 +251,10 @@ interface IDefaultPgOrmMethodsDefinitions<T> {
    *
    */
   pgInsert$?: {
+    preprocessing?: (object: T) => rx.Observable<any>;
     sql: string;
     params: () => any[];
-    returns?: (result: QueryResult, object?: T) => any;
+    returns?: (result: QueryResult, object?: T) => rx.Observable<any>;
   },
   /**
    *
@@ -264,9 +265,10 @@ interface IDefaultPgOrmMethodsDefinitions<T> {
    *
    */
   pgUpdate$?: {
+    preprocessing?: (object: T) => rx.Observable<any>;
     sql: string;
     params: () => any[];
-    returns?: (result: QueryResult, object?: T) => any;
+    returns?: (result: QueryResult, object?: T) => rx.Observable<any>;
   },
   /**
    *
@@ -277,9 +279,10 @@ interface IDefaultPgOrmMethodsDefinitions<T> {
    *
    */
   pgDelete$?: {
+    preprocessing?: (object: T) => rx.Observable<any>;
     sql: string;
     params: () => any[];
-    returns?: (result: QueryResult, object?: T) => any;
+    returns?: (result: QueryResult, object?: T) => rx.Observable<any>;
   }
 }
 
@@ -304,10 +307,25 @@ export function generateDefaultPgOrmMethods<T>(
 
     const c = config.pgInsert$;
 
+    // Modify SQL adding the RETURNING
+    const sql = `${c.sql.replace(/;+$/, "")} returning *;`;
+
+    // Generate a default preprocessing and returns function
+    const preprocessing: (object: T) => rx.Observable<any> =
+      c.preprocessing ? c.preprocessing : (object: T) => rx.of(object);
+
+    const returns: (result: QueryResult, object: T) => rx.Observable<any> =
+      c.returns ? c.returns : (result: QueryResult, object: T) => rx.of(object);
+
+    // Run
     (<any>object)["pgInsert$"] = (pg: RxPg): rx.Observable<T> => {
 
-      return executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
+      return preprocessing(object)
       .pipe(
+
+        rxo.concatMap((o: any) =>
+          executeParamQuery$({ pg: pg, sql: sql, params: c.params })
+        ),
 
         rxo.catchError((e: Error) => {
 
@@ -345,14 +363,7 @@ export function generateDefaultPgOrmMethods<T>(
 
         }),
 
-        rxo.map((o: QueryResult) => {
-
-          const r: (o: QueryResult) => any = c.returns !== undefined ?
-            c.returns : (o: QueryResult) => object;
-
-          return r(o);
-
-        })
+        rxo.concatMap((o: QueryResult) => returns(o, object))
 
       )
 
@@ -365,10 +376,25 @@ export function generateDefaultPgOrmMethods<T>(
 
     const c = config.pgUpdate$;
 
+    // Modify SQL adding the RETURNING
+    const sql = `${c.sql.replace(/;+$/, "")} returning *;`;
+
+    // Generate a default preprocessing and returns function
+    const preprocessing: (object: T) => rx.Observable<any> =
+      c.preprocessing ? c.preprocessing : (object: T) => rx.of(object);
+
+    const returns: (result: QueryResult, object: T) => rx.Observable<any> =
+      c.returns ? c.returns : (result: QueryResult, object: T) => rx.of(object);
+
+    // Run
     (<any>object)["pgUpdate$"] = (pg: RxPg): rx.Observable<T> => {
 
-      return executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
+      return preprocessing(object)
       .pipe(
+
+        rxo.concatMap((o: any) =>
+          executeParamQuery$({ pg: pg, sql: sql, params: c.params })
+        ),
 
         rxo.catchError((e: Error) => {
 
@@ -397,7 +423,7 @@ export function generateDefaultPgOrmMethods<T>(
 
         }),
 
-        rxo.map((o: QueryResult) => {
+        rxo.concatMap((o: QueryResult) => {
 
           // Check if there was any object updated, else throw not found
           if (o.rowCount === 0) {
@@ -408,10 +434,7 @@ export function generateDefaultPgOrmMethods<T>(
 
           }
 
-          const r: (o: QueryResult) => any = c.returns !== undefined ?
-            c.returns : (o: QueryResult) => object;
-
-          return r(o);
+          return returns(o, object);
 
         })
 
@@ -426,10 +449,25 @@ export function generateDefaultPgOrmMethods<T>(
 
     const c = config.pgDelete$;
 
+    // Modify SQL adding the RETURNING
+    const sql = `${c.sql.replace(/;+$/, "")} returning *;`;
+
+    // Generate a default preprocessing and returns function
+    const preprocessing: (object: T) => rx.Observable<any> =
+      c.preprocessing ? c.preprocessing : (object: T) => rx.of(object);
+
+    const returns: (result: QueryResult, object: T) => rx.Observable<any> =
+      c.returns ? c.returns : (result: QueryResult, object: T) => rx.of(object);
+
+    // Run
     (<any>object)["pgDelete$"] = (pg: RxPg): rx.Observable<any> => {
 
-      return executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
+      return preprocessing(object)
       .pipe(
+
+        rxo.concatMap((o: any) =>
+          executeParamQuery$({ pg: pg, sql: sql, params: c.params })
+        ),
 
         rxo.catchError((e: Error) => {
 
@@ -449,7 +487,7 @@ export function generateDefaultPgOrmMethods<T>(
 
         }),
 
-        rxo.map((o: QueryResult) => {
+        rxo.concatMap((o: QueryResult) => {
 
           // Check if there was any object updated, else throw not found
           if (o.rowCount === 0) {
@@ -460,10 +498,7 @@ export function generateDefaultPgOrmMethods<T>(
 
           }
 
-          const r: (o: QueryResult) => any = c.returns !== undefined ?
-            c.returns : (o: QueryResult) => object;
-
-          return r(o);
+          return returns(o, object);
 
         })
 

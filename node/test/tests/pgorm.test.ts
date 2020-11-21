@@ -92,14 +92,20 @@ describe("Check lists when they have elements", function() {
 
       (o: boolean) => expect(o).to.be.true,
 
-      (o: OrmTestSingleKey) => expect(o.b).to.be.deep.equal("A"),
+      (o: OrmTestSingleKey) =>
+        expect(o.b).to.be.deep
+          .equal("A modified by pgInsert$ preprocessing updated by pgInsert$ returns, not at DB"),
 
-      (o: OrmTestSingleKey) => expect(o.b).to.be.deep.equal("B"),
+      (o: OrmTestSingleKey) => expect(o.b)
+        .to.be.deep.equal("B modified by pgInsert$ preprocessing updated by pgInsert$ returns, not at DB"),
 
       (o: OrmTestSingleKey[]) => {
 
         expect(o.map((o: OrmTestSingleKey) => o.b))
-          .to.be.deep.equal([ "A", "B" ]);
+          .to.be.deep.equal([
+            "A modified by pgInsert$ preprocessing",
+            "B modified by pgInsert$ preprocessing"
+          ]);
 
       }
 
