@@ -102,7 +102,7 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
     // sequence in this object context
     PgOrm.generateDefaultPgOrmMethods(this, {
       pgInsert$: {
-        preprocessing: (object: OrmTestSingleKey) => {
+        preprocessing$: (object: OrmTestSingleKey) => {
 
           object.b = `${object.b} modified by pgInsert$ preprocessing`;
           return rx.of(object);
@@ -110,8 +110,8 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
         },
         sql: `insert into singlekeyobjects values ($1, $2, $3);
         `,
-        params: () => [ this.a, this.b, this.c ],
-        returns: (o: QueryResult, object: OrmTestSingleKey) => {
+        params$: () => rx.of([ this.a, this.b, this.c ]),
+        returns$: (o: QueryResult, object: OrmTestSingleKey) => {
 
           object.b = `${object.b} updated by pgInsert$ returns, not at DB`;
           return rx.of(object);
@@ -120,12 +120,12 @@ export class OrmTestSingleKey implements PgOrm.IPgOrm<OrmTestSingleKey> {
       },
       pgUpdate$: {
         sql: 'update singlekeyobjects set b=$1, c=$3 where a=$2;',
-        params: () => [ this.b, this.a, this.c ],
+        params$: (object: OrmTestSingleKey) => rx.of([ this.b, this.a, this.c ]),
         // returns: (o: QueryResult) => "OK"
       },
       pgDelete$: {
         sql: 'delete from singlekeyobjects where a=$1;',
-        params: () => [ this.a ]
+        params$: () => rx.of([ this.a ])
         // returns: (o: QueryResult) => o.rowCount
       }
     })

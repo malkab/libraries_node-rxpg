@@ -251,10 +251,10 @@ interface IDefaultPgOrmMethodsDefinitions<T> {
    *
    */
   pgInsert$?: {
-    preprocessing?: (object: T) => rx.Observable<any>;
+    preprocessing$?: (object: T) => rx.Observable<any>;
     sql: string;
-    params: () => any[];
-    returns?: (result: QueryResult, object?: T) => rx.Observable<any>;
+    params$: (object: T) => rx.Observable<any[]>;
+    returns$?: (result: QueryResult, object?: T) => rx.Observable<any>;
   },
   /**
    *
@@ -265,10 +265,10 @@ interface IDefaultPgOrmMethodsDefinitions<T> {
    *
    */
   pgUpdate$?: {
-    preprocessing?: (object: T) => rx.Observable<any>;
+    preprocessing$?: (object: T) => rx.Observable<any>;
     sql: string;
-    params: () => any[];
-    returns?: (result: QueryResult, object?: T) => rx.Observable<any>;
+    params$: (object: T) => rx.Observable<any[]>;
+    returns$?: (result: QueryResult, object?: T) => rx.Observable<any>;
   },
   /**
    *
@@ -279,10 +279,10 @@ interface IDefaultPgOrmMethodsDefinitions<T> {
    *
    */
   pgDelete$?: {
-    preprocessing?: (object: T) => rx.Observable<any>;
+    preprocessing$?: (object: T) => rx.Observable<any>;
     sql: string;
-    params: () => any[];
-    returns?: (result: QueryResult, object?: T) => rx.Observable<any>;
+    params$: (object: T) => rx.Observable<any[]>;
+    returns$?: (result: QueryResult, object?: T) => rx.Observable<any>;
   }
 }
 
@@ -309,10 +309,13 @@ export function generateDefaultPgOrmMethods<T>(
 
     // Generate a default preprocessing and returns function
     const preprocessing: (object: T) => rx.Observable<any> =
-      c.preprocessing ? c.preprocessing : (object: T) => rx.of(object);
+      c.preprocessing$ ? c.preprocessing$ : (object: T) => rx.of(object);
 
     const returns: (result: QueryResult, object: T) => rx.Observable<any> =
-      c.returns ? c.returns : (result: QueryResult, object: T) => rx.of(object);
+      c.returns$ ? c.returns$ : (result: QueryResult, object: T) => rx.of(object);
+
+    // To store computed params
+    let computedParams: any[];
 
     // Run
     (<any>object)["pgInsert$"] = (pg: RxPg): rx.Observable<T> => {
@@ -320,9 +323,14 @@ export function generateDefaultPgOrmMethods<T>(
       return preprocessing(object)
       .pipe(
 
-        rxo.concatMap((o: any) =>
-          executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
-        ),
+        rxo.concatMap((o: any) => c.params$(object)),
+
+        rxo.concatMap((o: any) => {
+
+          computedParams = o;
+          return executeParamQuery$({ pg: pg, sql: c.sql, params: () => computedParams })
+
+        }),
 
         rxo.catchError((e: Error) => {
 
@@ -331,7 +339,7 @@ export function generateDefaultPgOrmMethods<T>(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-              `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${c.params()}] invalid object parameters: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${computedParams}] invalid object parameters: `);
 
           }
 
@@ -340,7 +348,7 @@ export function generateDefaultPgOrmMethods<T>(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.UNMET_BACKEND_DEPENDENCY,
-              `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${c.params()}] unmet backend dependency: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${computedParams}] unmet backend dependency: `);
 
           }
 
@@ -349,14 +357,14 @@ export function generateDefaultPgOrmMethods<T>(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.DUPLICATED,
-              `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${c.params()}] duplicated: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${computedParams}] duplicated: `);
 
           }
 
           // Default throw
           throw new OrmError.OrmError(e,
             OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
-            `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${c.params()}] unspecified backend error: `);
+            `RxPg ORM ${(<any>object).constructor.name} pgInsert$ method params [${computedParams}] unspecified backend error: `);
 
         }),
 
@@ -375,10 +383,13 @@ export function generateDefaultPgOrmMethods<T>(
 
     // Generate a default preprocessing and returns function
     const preprocessing: (object: T) => rx.Observable<any> =
-      c.preprocessing ? c.preprocessing : (object: T) => rx.of(object);
+      c.preprocessing$ ? c.preprocessing$ : (object: T) => rx.of(object);
 
     const returns: (result: QueryResult, object: T) => rx.Observable<any> =
-      c.returns ? c.returns : (result: QueryResult, object: T) => rx.of(object);
+      c.returns$ ? c.returns$ : (result: QueryResult, object: T) => rx.of(object);
+
+    // To store computed params
+    let computedParams: any[];
 
     // Run
     (<any>object)["pgUpdate$"] = (pg: RxPg): rx.Observable<T> => {
@@ -386,9 +397,14 @@ export function generateDefaultPgOrmMethods<T>(
       return preprocessing(object)
       .pipe(
 
-        rxo.concatMap((o: any) =>
-          executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
-        ),
+        rxo.concatMap((o: any) => c.params$(object)),
+
+        rxo.concatMap((o: any) => {
+
+          computedParams = o;
+          return executeParamQuery$({ pg: pg, sql: c.sql, params: () => computedParams })
+
+        }),
 
         rxo.catchError((e: Error) => {
 
@@ -397,7 +413,7 @@ export function generateDefaultPgOrmMethods<T>(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-              `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${c.params()}] invalid object parameters: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${computedParams}] invalid object parameters: `);
 
           }
 
@@ -406,14 +422,14 @@ export function generateDefaultPgOrmMethods<T>(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.UNMET_BACKEND_DEPENDENCY,
-              `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${c.params()}] unmet backend dependency: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${computedParams}] unmet backend dependency: `);
 
           }
 
           // Default throw
           throw new OrmError.OrmError(e,
             OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
-            `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${c.params()}] unspecified backend error: `);
+            `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${computedParams}] unspecified backend error: `);
 
         }),
 
@@ -424,7 +440,7 @@ export function generateDefaultPgOrmMethods<T>(
 
             throw new OrmError.OrmError(new Error("not found"),
               OrmError.EORMERRORCODES.NOT_FOUND,
-              `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${c.params()}] not found error: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgUpdate$ method params [${computedParams}] not found error: `);
 
           }
 
@@ -445,20 +461,28 @@ export function generateDefaultPgOrmMethods<T>(
 
     // Generate a default preprocessing and returns function
     const preprocessing: (object: T) => rx.Observable<any> =
-      c.preprocessing ? c.preprocessing : (object: T) => rx.of(object);
+      c.preprocessing$ ? c.preprocessing$ : (object: T) => rx.of(object);
 
     const returns: (result: QueryResult, object: T) => rx.Observable<any> =
-      c.returns ? c.returns : (result: QueryResult, object: T) => rx.of(object);
+      c.returns$ ? c.returns$ : (result: QueryResult, object: T) => rx.of(object);
+
+    // To store computed params
+    let computedParams: any[];
 
     // Run
-    (<any>object)["pgDelete$"] = (pg: RxPg): rx.Observable<any> => {
+    (<any>object)["pgDelete$"] = (pg: RxPg): rx.Observable<T> => {
 
       return preprocessing(object)
       .pipe(
 
-        rxo.concatMap((o: any) =>
-          executeParamQuery$({ pg: pg, sql: c.sql, params: c.params })
-        ),
+        rxo.concatMap((o: any) => c.params$(object)),
+
+        rxo.concatMap((o: any) => {
+
+          computedParams = o;
+          return executeParamQuery$({ pg: pg, sql: c.sql, params: () => computedParams })
+
+        }),
 
         rxo.catchError((e: Error) => {
 
@@ -467,14 +491,14 @@ export function generateDefaultPgOrmMethods<T>(
 
             throw new OrmError.OrmError(e,
               OrmError.EORMERRORCODES.INVALID_OBJECT_PARAMETERS,
-              `RxPg ORM ${(<any>object).constructor.name} pgDelete$ method params [${c.params()}] invalid object parameters: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgDelete$ method params [${computedParams}] invalid object parameters: `);
 
           }
 
           // Default throw
           throw new OrmError.OrmError(e,
             OrmError.EORMERRORCODES.UNSPECIFIED_BACKEND_ERROR,
-            `RxPg ORM ${(<any>object).constructor.name} pgDelete$ method params [${c.params()}] unspecified backend error: `);
+            `RxPg ORM ${(<any>object).constructor.name} pgDelete$ method params [${computedParams}] unspecified backend error: `);
 
         }),
 
@@ -485,7 +509,7 @@ export function generateDefaultPgOrmMethods<T>(
 
             throw new OrmError.OrmError(new Error("not found"),
               OrmError.EORMERRORCODES.NOT_FOUND,
-              `RxPg ORM ${(<any>object).constructor.name} pgDelete$ method params [${c.params()}] not found error: `);
+              `RxPg ORM ${(<any>object).constructor.name} pgDelete$ method params [${computedParams}] not found error: `);
 
           }
 
