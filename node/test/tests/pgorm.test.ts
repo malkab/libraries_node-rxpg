@@ -73,9 +73,9 @@ describe("Check lists when they have elements", function() {
 
       clearDatabase$,
 
-      o0.pgInsert$(pg),
+      o0.pgInsert$(pg, { commandName: "insert", tableName: "singlekeyobjects" }),
 
-      o1.pgInsert$(pg),
+      o1.pgInsert$(pg, { commandName: "insert", tableName: "singlekeyobjects" }),
 
       PgOrm.selectMany$<OrmTestSingleKey>({
 

@@ -214,7 +214,7 @@ export interface IPgOrm<T> {
    * by the ORM router constructors like the one at Appian.
    *
    */
-  pgInsert$: (pg: RxPg) => rx.Observable<T>;
+  pgInsert$: (pg: RxPg, ...additionalParams: any) => rx.Observable<T>;
   /**
    *
    * Each class needs to implement a PATCH method that takes the object (this)
@@ -223,7 +223,7 @@ export interface IPgOrm<T> {
    * and control result in an standard way.
    *
    */
-  pgUpdate$: (pg: RxPg) => rx.Observable<T>;
+  pgUpdate$: (pg: RxPg, ...additionalParams: any) => rx.Observable<T>;
   /**
    *
    * Each class needs to implement a DELETE method that takes the object (this)
@@ -232,7 +232,7 @@ export interface IPgOrm<T> {
    * and control result in an standard way.
    *
    */
-  pgDelete$: (pg: RxPg) => rx.Observable<T>;
+  pgDelete$: (pg: RxPg, ...additionalParams: any) => rx.Observable<T>;
 }
 
 /**
@@ -251,10 +251,11 @@ interface IDefaultPgOrmMethodsDefinitions<T> {
    *
    */
   pgInsert$?: {
-    preprocessing$?: (object: T) => rx.Observable<any>;
-    sql: string;
-    params$: (object: T) => rx.Observable<any[]>;
-    returns$?: (result: QueryResult, object?: T) => rx.Observable<any>;
+    preprocessing$?: (object: T, additionalParams?: any) => rx.Observable<any>;
+    sql: (additionalParams?: any) => string;
+    params$: (object: T, additionalParams?: any) => rx.Observable<any[]>;
+    returns$?: (result: QueryResult, object?: T, additionalParams?: any) =>
+      rx.Observable<any>;
   },
   /**
    *
@@ -265,10 +266,11 @@ interface IDefaultPgOrmMethodsDefinitions<T> {
    *
    */
   pgUpdate$?: {
-    preprocessing$?: (object: T) => rx.Observable<any>;
-    sql: string;
-    params$: (object: T) => rx.Observable<any[]>;
-    returns$?: (result: QueryResult, object?: T) => rx.Observable<any>;
+    preprocessing$?: (object: T, additionalParams?: any) => rx.Observable<any>;
+    sql: (additionalParams?: any) => string;
+    params$: (object: T, additionalParams?: any) => rx.Observable<any[]>;
+    returns$?: (result: QueryResult, object?: T, additionalParams?: any) =>
+      rx.Observable<any>;
   },
   /**
    *
@@ -279,10 +281,11 @@ interface IDefaultPgOrmMethodsDefinitions<T> {
    *
    */
   pgDelete$?: {
-    preprocessing$?: (object: T) => rx.Observable<any>;
-    sql: string;
-    params$: (object: T) => rx.Observable<any[]>;
-    returns$?: (result: QueryResult, object?: T) => rx.Observable<any>;
+    preprocessing$?: (object: T, additionalParams?: any) => rx.Observable<any>;
+    sql: (additionalParams?: any) => string;
+    params$: (object: T, additionalParams?: any) => rx.Observable<any[]>;
+    returns$?: (result: QueryResult, object?: T, additionalParams?: any) =>
+      rx.Observable<any>;
   }
 }
 
@@ -308,27 +311,28 @@ export function generateDefaultPgOrmMethods<T>(
     const c = config.pgInsert$;
 
     // Generate a default preprocessing and returns function
-    const preprocessing: (object: T) => rx.Observable<any> =
-      c.preprocessing$ ? c.preprocessing$ : (object: T) => rx.of(object);
+    const preprocessing: (object: T, additionalParams?: any) => rx.Observable<any> =
+      c.preprocessing$ ? c.preprocessing$ : (object: T, additionalParams?: any) => rx.of(object);
 
-    const returns: (result: QueryResult, object: T) => rx.Observable<any> =
-      c.returns$ ? c.returns$ : (result: QueryResult, object: T) => rx.of(object);
+    const returns: (result: QueryResult, object: T, additionalParams?: any) => rx.Observable<any> =
+      c.returns$ ? c.returns$ : (result: QueryResult, object: T, additionalParams?: any) => rx.of(object);
 
     // To store computed params
     let computedParams: any[];
 
     // Run
-    (<any>object)["pgInsert$"] = (pg: RxPg): rx.Observable<T> => {
+    (<any>object)["pgInsert$"] = (pg: RxPg, additionalParams?: any): rx.Observable<T> => {
 
-      return preprocessing(object)
+      return preprocessing(object, additionalParams)
       .pipe(
 
-        rxo.concatMap((o: any) => c.params$(object)),
+        rxo.concatMap((o: any) => c.params$(object, additionalParams)),
 
         rxo.concatMap((o: any) => {
 
           computedParams = o;
-          return executeParamQuery$({ pg: pg, sql: c.sql, params: () => computedParams })
+          return executeParamQuery$({ pg: pg, sql: c.sql(additionalParams),
+            params: () => computedParams })
 
         }),
 
@@ -368,7 +372,7 @@ export function generateDefaultPgOrmMethods<T>(
 
         }),
 
-        rxo.concatMap((o: QueryResult) => returns(o, object))
+        rxo.concatMap((o: QueryResult) => returns(o, object, additionalParams))
 
       )
 
@@ -382,27 +386,28 @@ export function generateDefaultPgOrmMethods<T>(
     const c = config.pgUpdate$;
 
     // Generate a default preprocessing and returns function
-    const preprocessing: (object: T) => rx.Observable<any> =
-      c.preprocessing$ ? c.preprocessing$ : (object: T) => rx.of(object);
+    const preprocessing: (object: T, additionalParams?: any) => rx.Observable<any> =
+      c.preprocessing$ ? c.preprocessing$ : (object: T, additionalParams?: any) => rx.of(object);
 
-    const returns: (result: QueryResult, object: T) => rx.Observable<any> =
-      c.returns$ ? c.returns$ : (result: QueryResult, object: T) => rx.of(object);
+    const returns: (result: QueryResult, object: T, additionalParams?: any) => rx.Observable<any> =
+      c.returns$ ? c.returns$ : (result: QueryResult, object: T, additionalParams?: any) => rx.of(object);
 
     // To store computed params
     let computedParams: any[];
 
     // Run
-    (<any>object)["pgUpdate$"] = (pg: RxPg): rx.Observable<T> => {
+    (<any>object)["pgUpdate$"] = (pg: RxPg, additionalParams?: any): rx.Observable<T> => {
 
-      return preprocessing(object)
+      return preprocessing(object, additionalParams)
       .pipe(
 
-        rxo.concatMap((o: any) => c.params$(object)),
+        rxo.concatMap((o: any) => c.params$(object, additionalParams)),
 
         rxo.concatMap((o: any) => {
 
           computedParams = o;
-          return executeParamQuery$({ pg: pg, sql: c.sql, params: () => computedParams })
+          return executeParamQuery$({ pg: pg, sql: c.sql(additionalParams),
+            params: () => computedParams })
 
         }),
 
@@ -444,7 +449,7 @@ export function generateDefaultPgOrmMethods<T>(
 
           }
 
-          return returns(o, object);
+          return returns(o, object, additionalParams)
 
         })
 
@@ -460,27 +465,28 @@ export function generateDefaultPgOrmMethods<T>(
     const c = config.pgDelete$;
 
     // Generate a default preprocessing and returns function
-    const preprocessing: (object: T) => rx.Observable<any> =
-      c.preprocessing$ ? c.preprocessing$ : (object: T) => rx.of(object);
+    const preprocessing: (object: T, additionalParams?: any) => rx.Observable<any> =
+      c.preprocessing$ ? c.preprocessing$ : (object: T, additionalParams?: any) => rx.of(object);
 
-    const returns: (result: QueryResult, object: T) => rx.Observable<any> =
-      c.returns$ ? c.returns$ : (result: QueryResult, object: T) => rx.of(object);
+    const returns: (result: QueryResult, object: T, additionalParams?: any) => rx.Observable<any> =
+      c.returns$ ? c.returns$ : (result: QueryResult, object: T, additionalParams?: any) => rx.of(object);
 
     // To store computed params
     let computedParams: any[];
 
     // Run
-    (<any>object)["pgDelete$"] = (pg: RxPg): rx.Observable<T> => {
+    (<any>object)["pgDelete$"] = (pg: RxPg, additionalParams?: any): rx.Observable<T> => {
 
-      return preprocessing(object)
+      return preprocessing(object, additionalParams)
       .pipe(
 
-        rxo.concatMap((o: any) => c.params$(object)),
+        rxo.concatMap((o: any) => c.params$(object, additionalParams)),
 
         rxo.concatMap((o: any) => {
 
           computedParams = o;
-          return executeParamQuery$({ pg: pg, sql: c.sql, params: () => computedParams })
+          return executeParamQuery$({ pg: pg, sql: c.sql(additionalParams),
+            params: () => computedParams })
 
         }),
 
@@ -513,7 +519,7 @@ export function generateDefaultPgOrmMethods<T>(
 
           }
 
-          return returns(o, object);
+          return returns(o, object, additionalParams);
 
         })
 
