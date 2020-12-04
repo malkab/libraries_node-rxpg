@@ -552,7 +552,7 @@ export function executeParamQuery$({
 }): rx.Observable<any> {
 
   return pg.executeParamQuery$(sql, {
-    params: params(), nullAsUndefined: true })
+    params: params() })
   .pipe(
 
     // Return true if successfull
@@ -624,7 +624,7 @@ export function select$<T>({
 }): rx.Observable<T> {
 
   return pg.executeParamQuery$( sql, {
-    params: params(), nullAsUndefined: true })
+    params: params() })
   .pipe(
 
     rxo.concatMap((o: QueryResult) => {
@@ -738,7 +738,7 @@ export function selectMany$<T>({
 }): rx.Observable<T[]> {
 
   return pg.executeParamQuery$(sql, {
-    params: params(), nullAsUndefined: true })
+    params: params() })
   .pipe(
 
     rxo.concatMap((o: QueryResult) => {

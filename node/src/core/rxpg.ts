@@ -1,5 +1,7 @@
 import * as fs from "fs";
 
+import { isNull, isUndefined } from 'lodash';
+
 import { Pool, PoolConfig, QueryResult } from "pg";
 
 import * as rx from "rxjs";
@@ -141,11 +143,35 @@ export class RxPg {
    *
    * Executes a script file.
    *
+   * @param file
+   * The file containing the script.
+   *
+   * @returns
+   * A set of QueryResults, generally an array if the script has multiple
+   * instructions. No sanitization is performed on the result.
+   *
    */
   public executeScript$(file: string): rx.Observable<QueryResult> {
 
     const script = fs.readFileSync(file).toString();
-    return this.executeParamQuery$(script);
+
+    return new rx.Observable<QueryResult>((o: any) => {
+
+      this._pool.query(script)
+      .then((queryResults: QueryResult) => {
+
+        o.next(queryResults);
+        o.complete();
+
+      })
+      .catch((error: any) => {
+
+        o.error(error);
+        o.complete();
+
+      })
+
+    })
 
   }
 
@@ -184,11 +210,9 @@ export class RxPg {
   public executeParamQuery$(
     query: string,
     {
-      params,
-      nullAsUndefined = false
+      params
     }: {
-      params?: any[],
-      nullAsUndefined?: boolean
+      params?: any[]
     } = {}
   ): rx.Observable<QueryResult> {
 
@@ -197,15 +221,18 @@ export class RxPg {
       this._pool.query(query, params)
       .then((queryResult: QueryResult) => {
 
-        if (nullAsUndefined) {
+        // Sanitize results to preserve nulls as undefined
+        queryResult.rows.map((o: any) => {
 
-          queryResult.rows.map((o: any) => {
+          Object.keys(o).map((k: string) => {
 
-            Object.keys(o).map((k: string) => o[k] = o[k] ? o[k] : undefined)
+            if (isNull(o[k])) o[k] = undefined;
+
+            return o[k];
 
           })
 
-        }
+        })
 
         o.next(queryResult);
         o.complete();

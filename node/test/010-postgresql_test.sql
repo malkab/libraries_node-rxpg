@@ -46,7 +46,10 @@ create table test_null_undefined(
   null_integer integer,
   null_varchar varchar,
   undefined_integer integer,
-  undefined_varchar varchar
+  undefined_varchar varchar,
+  boolean_true boolean,
+  boolean_false boolean,
+  zero integer
 );
 
 commit;

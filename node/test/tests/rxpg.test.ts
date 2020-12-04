@@ -151,7 +151,7 @@ describe("Stress the connection", function() {
  * Test undefined and null.
  *
  */
-describe("Test undefined and null", function() {
+describe("Test undefined, true, false, 0, and null", function() {
 
   rxMochaTests({
 
@@ -161,14 +161,13 @@ describe("Test undefined and null", function() {
 
       pg.executeParamQuery$(`
         insert into test_null_undefined
-        values ($1, $2, $3, $4);
+        values ($1, $2, $3, $4, $5, $6, $7);
       `, {
-        params: [ null, null, undefined, undefined ],
+        params: [ null, null, undefined, undefined, true, false, 0 ],
       }),
 
       pg.executeParamQuery$(`
-        select * from test_null_undefined;`,
-        { nullAsUndefined: true })
+        select * from test_null_undefined;`)
 
     ],
 
@@ -183,7 +182,10 @@ describe("Test undefined and null", function() {
           null_integer: undefined,
           null_varchar: undefined,
           undefined_integer: undefined,
-          undefined_varchar: undefined
+          undefined_varchar: undefined,
+          boolean_true: true,
+          boolean_false: false,
+          zero: 0
         })
 
     ],
