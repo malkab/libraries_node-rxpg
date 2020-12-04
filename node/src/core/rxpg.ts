@@ -1,6 +1,6 @@
 import * as fs from "fs";
 
-import { isNull, isUndefined } from 'lodash';
+import { isNull, isArray } from 'lodash';
 
 import { Pool, PoolConfig, QueryResult } from "pg";
 
@@ -193,18 +193,17 @@ export class RxPg {
 
   /**
    *
-   * Executes an arbitrary parametrized query. By default, null database values
-   * are returned as **null**, but this is sometimes very inconvenient, for
-   * example, for ORM operations with deconstructed parameters. The option
-   * nullAsUndefined transforms nulls coming from the DB into undefined.
+   * Executes an arbitrary parametrized query. **null** results are sanitized to
+   * undefined for deconstructed constructors. Also, if a multiline query is
+   * given, the resulting observable will emit a QueryResult object for each of
+   * the results in the multiquery before completing.
    *
    * @param query
    * The query to be executed.
    *
    * @param __namedParameters
    * Two options are available:
-   * - **params:** parameters for the query
-   * - **nullAsUndefined:** transforms nulls coming from the DB into undefined
+   * - **params:** parameters for the query.
    *
    */
   public executeParamQuery$(
@@ -221,21 +220,19 @@ export class RxPg {
       this._pool.query(query, params)
       .then((queryResult: QueryResult) => {
 
-        // Sanitize results to preserve nulls as undefined
-        queryResult.rows.map((o: any) => {
+        if (isArray(queryResult)) {
 
-          Object.keys(o).map((k: string) => {
+          queryResult.map((q: QueryResult) =>
+            o.next(this._sanitizeDbRowSetData(q)));
 
-            if (isNull(o[k])) o[k] = undefined;
+          o.complete();
 
-            return o[k];
+        } else {
 
-          })
+          o.next(this._sanitizeDbRowSetData(queryResult));
+          o.complete();
 
-        })
-
-        o.next(queryResult);
-        o.complete();
+        }
 
       })
       .catch((error: any) => {
@@ -530,6 +527,31 @@ export class RxPg {
       })
 
     )
+
+  }
+
+  /**
+   *
+   * Sanitizes a QueryResult by checking all its rows the data. Basicly, nulls
+   * are translated to undefined.
+   *
+   */
+  private _sanitizeDbRowSetData(queryResult: QueryResult): QueryResult {
+
+    // Sanitize results to preserve nulls as undefined
+    queryResult.rows.map((o: any) => {
+
+      Object.keys(o).map((k: string) => {
+
+        if (isNull(o[k])) o[k] = undefined;
+
+        return o[k]
+
+      })
+
+    })
+
+    return queryResult;
 
   }
 

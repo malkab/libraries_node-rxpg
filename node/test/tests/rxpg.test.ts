@@ -195,3 +195,44 @@ describe("Test undefined, true, false, 0, and null", function() {
   })
 
 })
+
+/**
+ *
+ * Test multiline queries.
+ *
+ */
+describe("Test multiline queries", function() {
+
+  rxMochaTests({
+
+    testCaseName: "Test multiline queries",
+
+    observables: [
+
+      pg.executeParamQuery$(`select 60 as a`),
+
+      pg.executeParamQuery$(`
+        select 10 as a;
+        select 20 as a;
+      `)
+
+    ],
+
+    assertions: [
+
+      (o: QueryResult) =>
+        expect(o.rows[0].a, "Single line query").to.be.equal(60),
+
+      (o: QueryResult) =>
+        expect(o.rows[0].a, "Double line query, first value").to.be.equal(10),
+
+      (o: QueryResult) =>
+        expect(o.rows[0].a, "Double line query, second value").to.be.equal(20)
+
+    ],
+
+    verbose: false
+
+  })
+
+})
