@@ -614,13 +614,13 @@ export function select$<T>({
   sql,
   type,
   params = () => [],
-  newFunction = (params: any) => rx.of(new type(params))
+  newFunction$ = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
   params?: () => any[];
-  newFunction?: (params: any) => rx.Observable<any>;
+  newFunction$?: (params: any) => rx.Observable<any>;
 }): rx.Observable<T> {
 
   return pg.executeParamQuery$( sql, {
@@ -636,7 +636,7 @@ export function select$<T>({
 
       }
 
-      return newFunction(
+      return newFunction$(
         { ...o.rows[0], select$params: { pg: pg, params: params() } })
 
     }),
@@ -728,13 +728,13 @@ export function selectMany$<T>({
   sql,
   type,
   params = () => [],
-  newFunction = (params: any) => rx.of(new type(params))
+  newFunction$ = (params: any) => rx.of(new type(params))
 }: {
   pg: RxPg;
   sql: string;
   type: any;
   params?: () => any[];
-  newFunction?: (params: any) => rx.Observable<any>;
+  newFunction$?: (params: any) => rx.Observable<any>;
 }): rx.Observable<T[]> {
 
   return pg.executeParamQuery$(sql, {
@@ -744,7 +744,7 @@ export function selectMany$<T>({
     rxo.concatMap((o: QueryResult) => {
 
       const obs: rx.Observable<T>[] =
-        o.rows.map((r: any) => newFunction({ ...r,
+        o.rows.map((r: any) => newFunction$({ ...r,
           selectMany$params: { pg: pg, params: params() } }));
 
       if (obs.length > 0) {
