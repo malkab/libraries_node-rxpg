@@ -29,6 +29,7 @@ export class RxPg {
   private _maxPoolSize: number;
   private _minPoolSize: number;
   private _applicationName: string | undefined;
+  private _keepAlive: boolean;
   // number of milliseconds a client must sit idle in the pool and not be
   // checked out before it is disconnected from the backend and discarded
   // default is 10000 (10 seconds) - set to 0 to disable auto-disconnection of
@@ -51,7 +52,8 @@ export class RxPg {
       max: this._maxPoolSize,
       min: this._minPoolSize,
       idleTimeoutMillis: this._idleTimeoutMillis,
-      application_name: this._applicationName
+      application_name: this._applicationName,
+      keepAlive: this._keepAlive
     };
 
   }
@@ -75,10 +77,11 @@ export class RxPg {
     user="postgres",
     pass="postgres",
     db="postgres",
-    maxPoolSize=10,
-    minPoolSize=3,
+    maxPoolSize = 10,
+    minPoolSize = 3,
     applicationName,
-    idleTimeoutMillis=10000,
+    idleTimeoutMillis = 10000,
+    keepAlive = true,
     onConnectEvent = undefined,
     onAcquireEvent = undefined,
     onErrorEvent = undefined,
@@ -93,6 +96,7 @@ export class RxPg {
     minPoolSize?: number;
     applicationName?: string;
     idleTimeoutMillis?: number;
+    keepAlive?: boolean;
     onConnectEvent?: (client: any) => void;
     onAcquireEvent?: (client: any) => void;
     onErrorEvent?: (err: Error, client: any) => void;
@@ -106,6 +110,7 @@ export class RxPg {
     this._database = db;
     this._maxPoolSize = +maxPoolSize;
     this._minPoolSize = +minPoolSize;
+    this._keepAlive = keepAlive;
 
     if (applicationName) {
 
