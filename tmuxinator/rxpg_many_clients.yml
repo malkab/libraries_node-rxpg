@@ -1,5 +1,5 @@
 name: rxpg
-root: /home/git/malkab-libraries-node/rxpg
+root: /home/git/libraries_node/libraries_node-rxpg
 
 windows:
   - dev: cd docker ; . mlkcontext common ; sleep 2 ; clear ; ./020_docker_node_interactive.sh
