@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Version: 2020-08-19
+# Version: 2021-06-12
 
 # -----------------------------------------------------------------
 #
@@ -12,55 +12,71 @@
 # Express programs, and also for Angular frontend development.
 #
 # -----------------------------------------------------------------
-
-# Check mlk-context to check. If void, no check will be performed.
-MATCH_MLKCONTEXT=common
-# Node image version.
+# Check mlkctxt to check. If void, no check will be performed. If NOTNULL,
+# any activated context will do, but will fail if no context was activated.
+MATCH_MLKCTXT=
+# User UID and GID in the UID:GID form. Defaults to 0:0. This uses the --user
+# Docker parameter in case an user is already defined at the image.
+USER=1000:1000
+# Custom command or path to script (relative to WORKDIR) to execute, for example
+# "/bin/bash -c \"ls -lh\"". Leave blank for using the image's built-in option.
+# This has a strong interaction with the ENTRYPOINT parameter.
+COMMAND=
+# Node image version. Defaults to "latest".
 NODE_VERSION=12.16.3
-# Env mode: production / development.
-NODE_ENV=development
-# Node memory.
-NODE_MEMORY=2GB
-# Null for an interactive shell session, the EXEC is passed to /bin/bash with
-# the -c option. Can be used to run Node scripts with "node whatever" or run npm
-# targets with "npm run whatever".
-EXEC=
+# Env mode: production / development. Defaults to "development".
+NODE_ENV=
+# Node memory. Defaults to "2GB".
+NODE_MEMORY=
 # The network to connect to. Remember that when attaching to the network of an
-# existing container (using container:name) the HOST is "localhost".
-NETWORK=$MLKC_RXPG_APP_NAME
-# Jupyter mode: runs a Jupyter server with Javascript support if a version with
-# this capability is used. Jupyter exports automatically the 8888 port.
-JUPYTER=false
-# Container name.
-CONTAINER_NAME=rxpg-node-test
-# Container host name. Incompatible with NETWORK=container:XXX.
-CONTAINER_HOST_NAME=
+# existing container (using container:name) the HOST is "localhost". Also the
+# host network can be connected using just "host".
+NETWORK=rxpg
+# Container identifier root. This is used for both the container name (adding an
+# UID to avoid clashing) and the container host name (without UID). Incompatible
+# with NETWORK container:name option. If blank, a Docker engine default name
+# will be assigned to the container.
+ID_ROOT=rxpg-node-test
+# Unique? If true, no container with the same name can be created. Defaults to
+# true.
+UNIQUE=
+# Work dir. Use $(pwd) paths. Defaults to /.
+WORKDIR=$(pwd)/../node/
+# Run mode. Can be PERSISTABLE (-ti), VOLATILE (-ti --rm), or DAEMON (-d). If
+# blank, defaults to VOLATILE.
+RUN_MODE=
 # A set of volumes in the form ("source:destination" "source:destination"). Most
 # of the times the src folder of the Node source code base is replicated inside
 # the container with the same path so build systems works as expected (see
 # second line as example). Also this tend to be the WORKDIR As default, the user
 # local .npmrc is also included as a volume, so login permissions to private
 # repos are shared with the container.
+# The first node folder keeps the .git out, so yarn publish tries not to set a
+# Git tag. If other folders in the path are needed, the second mounts into the
+# container a far broader folder selection, but .git will be visible to yarn and
+# it will be asking for Git details when publishing. To avoid that, use yarn
+# publish --no-git-tag-version.
 VOLUMES=(
-  $(pwd):/ext_src
-  $(pwd)/../node/:$(pwd)/../node/
   ~/.npmrc:/root/.npmrc
   ~/.npmrc:/home/node/.npmrc
+  $(pwd):/ext_src
+  $(pwd)/../node/:$(pwd)/../node/
 )
-# Volatile (-ti --rm).
-VOLATILE=true
+# Env vars. Use ENV_VAR_NAME_CONTAINER=ENV_VAR_NAME_HOST format. Defaults to ().
+ENV_VARS=
 # Open ports in the form (external:internal external:internal). Ports 9229 and
 # 9329 are typically container-level assigned port for remote debuggers. Port
 # 8080 is typically assigned at container-level to an Express app entrypoint.
-# Angular applications traditionally export port 4200. Incompatible with
-# NETWORK=container:XXX.
+# Angular applications traditionally export port 4200. 8888 is used by Jupyter
+# notebooks. Incompatible with NETWORK=container:XXX.
 PORTS=()
-# Custom entrypoint.
-ENTRYPOINT=/bin/bash
-# Custom workdir.
-WORKDIR=$(pwd)/../node/
-# Use display for X11 host server?
-X11=false
+# Custom entrypoint, leave blank for using the image's built-in option.
+ENTRYPOINT=
+# The following options are mutually exclusive. Use display for X11 host server
+# in Mac? Defaults to false.
+X11_MAC=
+# Use display for X11 host server in Linux? Defaults to false.
+X11_LINUX=
 
 
 
@@ -68,64 +84,75 @@ X11=false
 
 # ---
 
-# Check mlkcontext
-if [ ! -z "${MATCH_MLKCONTEXT}" ] ; then
+# Check mlkctxt is present at the system
+if command -v mlkctxt &> /dev/null ; then
 
-  if [ ! "$(mlkcontext)" = "$MATCH_MLKCONTEXT" ] ; then
+  if ! mlkctxt -c $MATCH_MLKCTXT ; then exit 1 ; fi
 
-    echo Please initialise context $MATCH_MLKCONTEXT
+fi
 
-    exit 1
+# Manage identifier
+if [ ! -z "${ID_ROOT}" ] ; then
+
+  N="${ID_ROOT}_"
+  CONTAINER_HOST_NAME_F="--hostname ${N}"
+
+  if [ "${UNIQUE}" = false ] ; then
+
+    CONTAINER_NAME_F="--name ${N}_$(uuidgen)"
+
+  else
+
+    CONTAINER_NAME_F="--name ${N}"
 
   fi
 
 fi
 
-if [ ! -z "${EXEC}" ]; then COMMAND="-c \"${EXEC}\"" ; fi
+# Network
+if [ ! -z "${NETWORK}" ]; then NETWORK="--network=${NETWORK}" ; fi
 
-if [ ! -z "${NETWORK}" ] ; then
+# Env vars
+ENV_VARS_F=
 
-  NETWORK="--network=${NETWORK}"
+if [ ! -z "${ENV_VARS}" ] ; then
+
+  for E in "${ENV_VARS[@]}" ; do
+
+    ARR_E=(${E//=/ })
+
+    ENV_VARS_F="${ENV_VARS_F} -e ${ARR_E[0]}=${ARR_E[1]} "
+
+  done
 
 fi
 
-if [ "${X11}" = true ] ; then
+# Default X11
+X11_F=
 
-  X11="-e DISPLAY=host.docker.internal:0"
+# X11 for Mac
+if [ "${X11_MAC}" = true ] ; then
 
+  # Get local IP
+  IP=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}')
+  X11_F="-e DISPLAY=$IP:0"
   # Prepare XQuartz server
-  xhost + 127.0.0.1
-
-else
-
-  X11=
+  xhost +$IP
 
 fi
 
-if [ ! -z "${CONTAINER_NAME}" ] ; then
+# X11 for Linux
+if [ "${X11_LINUX}" = true ] ; then
 
-  CONTAINER_NAME="--name=${CONTAINER_NAME}"
-
-fi
-
-if [ ! -z "${CONTAINER_HOST_NAME}" ] ; then
-
-  CONTAINER_HOST_NAME="--hostname=${CONTAINER_HOST_NAME}"
+  X11_F="-e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix"
 
 fi
 
-if [ ! -z "${ENTRYPOINT}" ] ; then
+# Workdir
+WORKDIR_F="--workdir /"
+if [ ! -z "${WORKDIR}" ] ; then WORKDIR_F="--workdir ${WORKDIR}" ; fi
 
-  ENTRYPOINT="--entrypoint ${ENTRYPOINT}"
-
-fi
-
-if [ ! -z "${WORKDIR}" ] ; then
-
-  WORKDIR="--workdir ${WORKDIR}"
-
-fi
-
+# Volumes
 VOLUMES_F=
 
 if [ ! -z "${VOLUMES}" ] ; then
@@ -138,6 +165,7 @@ if [ ! -z "${VOLUMES}" ] ; then
 
 fi
 
+# Ports
 PORTS_F=
 
 if [ ! -z "${PORTS}" ] ; then
@@ -150,33 +178,72 @@ if [ ! -z "${PORTS}" ] ; then
 
 fi
 
-if [ "$JUPYTER" = true ] ; then
+# Run mode
+if [ ! -z "$RUN_MODE" ] ; then
 
-  COMMAND="-c \"jupyter notebook --ip 0.0.0.0 --allow-root\""
-  PORTS_F="${PORTS_F} -p 8888:8888 "
+  if [ "$RUN_MODE" = "PERSISTABLE" ] ; then
 
-fi
+    COMMAND_DOCKER="docker run -ti"
 
-if [ "$VOLATILE" = true ] ; then
+  elif [ "$RUN_MODE" = "VOLATILE" ] ; then
 
-  DOCKER_COMMAND="docker run -ti --rm"
+    COMMAND_DOCKER="docker run -ti --rm"
+
+  elif [ "$RUN_MODE" = "DAEMON" ] ; then
+
+    COMMAND_DOCKER="docker run -d"
+
+  else
+
+    echo Error: unrecognized RUN_MODE $RUN_MODE, exiting...
+    exit 1
+
+  fi
 
 else
 
-  DOCKER_COMMAND="docker run -ti"
+  COMMAND_DOCKER="docker run -ti --rm"
 
 fi
 
-eval  $DOCKER_COMMAND \
-        -e "NODE_ENV=${NODE_ENV}" \
-        -e "NODE_MEMORY=${NODE_MEMORY}" \
+# Entrypoint
+ENTRYPOINT_F=
+
+if [ ! -z "${ENTRYPOINT}" ] ; then
+
+  ENTRYPOINT_F="--entrypoint ${ENTRYPOINT}"
+
+fi
+
+# User
+USER_F="--user 0:0"
+if [ ! -z "${USER}" ] ; then USER_F="--user ${USER}:${USER}" ; fi
+
+# Node version
+NODE_VERSION_F="latest"
+if [ ! -z "${NODE_VERSION}" ] ; then NODE_VERSION_F=$NODE_VERSION ; fi
+
+# Node environment
+NODE_ENV_F=development
+if [ ! -z "${NODE_ENV}" ] ; then NODE_ENV_F=$NODE_ENV ; fi
+
+# Node memory
+NODE_MEMORY_F=2GB
+if [ ! -z "${NODE_MEMORY}" ] ; then NODE_MEMORY_F=$NODE_MEMORY ; fi
+
+# Final command
+eval  $COMMAND_DOCKER \
+        -e "NODE_ENV=${NODE_ENV_F}" \
+        -e "NODE_MEMORY=${NODE_MEMORY_F}" \
         $NETWORK \
-        $CONTAINER_NAME \
-        $CONTAINER_HOST_NAME \
-        $X11 \
+        $CONTAINER_NAME_F \
+        $CONTAINER_HOST_NAME_F \
         $VOLUMES_F \
+        $X11_F \
         $PORTS_F \
-        $ENTRYPOINT \
-        $WORKDIR \
-        malkab/nodejs-dev:$NODE_VERSION \
+        $ENTRYPOINT_F \
+        $WORKDIR_F \
+        $ENV_VARS_F \
+        $USER_F \
+        malkab/nodejs-dev:$NODE_VERSION_F \
         $COMMAND
