@@ -1,6 +1,6 @@
 {
   "name": "@malkab/rxpg",
-  "version": "4.1.26",
+  "version": "5.0.0",
   "description": "A RxJS PostgreSQL interface.",
   "scope": "@malkab",
   "author": {
@@ -22,48 +22,49 @@
   },
   "private": false,
   "scripts": {
+    "package-json-version": "echo 2021-07-19",
     "clean": "rm -Rf build ; rm -Rf dist",
     "quick-test": "npm-run-all --parallel service:watch:quick-test:server service:build",
     "start": "npm-run-all --parallel service:watch:mocha:server service:build",
-    "build": "npm run clean ; npm run service:build-lib",
-    "build-with-docs": "npm run clean ; npm run service:build-lib ; npm run build-docs ; rm -Rf docs ; cp -R typedoc/build/html docs",
+    "build": "yarn clean ; yarn service:build-lib",
+    "build-with-docs": "yarn clean ; yarn service:build-lib ; yarn build-docs ; rm -Rf docs ; cp -R typedoc/build/html docs",
     "build-docs": "cd typedoc ; ./html ; cd ..",
-    "service:build-lib": "webpack --config webpack-production.config.js --progress --colors",
-    "service:build": "webpack --progress --colors",
+    "publish-dev": "yarn build ; yarn publish --patch --no-git-tag-version",
+    "publish-production": "yarn build-with-docs ; yarn publish --no-git-tag-version",
+    "service:build-lib": "webpack --config webpack-production.config.js --progress",
+    "service:build": "webpack --progress --watch",
     "service:watch:quick-test:server": "nodemon --inspect=0.0.0.0:9329 \"./build/quicktest.js\" --watch \"./build/quicktest.js\"",
     "service:watch:mocha:server": "nodemon --ext js --watch ./build/ --exec 'mocha --timeout 20000 ./build/mocha.js || true'"
   },
   "engines": {
-    "node": "^12.0.0"
+    "node": "^14.0.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.14",
-    "@types/lodash": "^4.14.165",
-    "@types/mocha": "^8.0.4",
-    "@types/node": "^14.14.10",
-    "@types/pg": "^7.14.7",
-    "@types/webpack-env": "^1.16.0",
+    "@types/chai": "^4.0.0",
+    "@types/lodash": "^4.0.0",
+    "@types/mocha": "^8.0.0",
+    "@types/node": "^16.0.0",
+    "@types/pg": "^8.0.0",
     "chai": "^4.2.0",
-    "clean-webpack-plugin": "^3.0.0",
-    "mocha": "^7.2.0",
-    "nodemon": "^2.0.6",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "eslint": "^7.0.0",
+    "mocha": "^9.0.0",
+    "nodemon": "^2.0.0",
     "npm-run-all": "^4.1.5",
-    "terser": "^5.5.1",
-    "terser-webpack-plugin": "^4.2.2",
-    "ts-loader": "^8.0.11",
-    "tslint": "^6.1.3",
-    "typedoc": "^0.19.2",
-    "typescript": "^4.1.2",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12",
-    "webpack-filter-warnings-plugin": "^1.2.1",
-    "webpack-node-externals": "^2.5.2"
+    "terser": "^5.0.0",
+    "terser-webpack-plugin": "^5.0.0",
+    "ts-loader": "^9.0.0",
+    "typedoc": "^0.21.2",
+    "typescript": "^4.0.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^4.0.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "@malkab/ts-utils": "^4.1.11",
+    "@malkab/ts-utils": "^5.0.0",
     "lodash": "^4.17.20",
     "pg": "^8.5.1",
     "pg-native": "^3.0.0",
-    "rxjs": "^6.6.2"
+    "rxjs": "^7.0.0"
   }
 }

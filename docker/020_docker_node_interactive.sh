@@ -23,7 +23,7 @@ USER=1000:1000
 # This has a strong interaction with the ENTRYPOINT parameter.
 COMMAND=
 # Node image version. Defaults to "latest".
-NODE_VERSION=12.16.3
+NODE_VERSION=14.17.3
 # Env mode: production / development. Defaults to "development".
 NODE_ENV=
 # Node memory. Defaults to "2GB".
