@@ -37,7 +37,7 @@ module.exports = {
       exclude: [
 
         path.join(__dirname, "/node_modules/"),
-        path.join(__dirname, "/src/test/")
+        path.join(__dirname, "/test/")
 
       ]
     }]
