@@ -1,6 +1,6 @@
 {
   "name": "@malkab/rxpg",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "A RxJS PostgreSQL interface.",
   "scope": "@malkab",
   "author": {
@@ -35,9 +35,6 @@
     "service:build": "webpack --progress --watch",
     "service:watch:quick-test:server": "nodemon --inspect=0.0.0.0:9329 \"./build/quicktest.js\" --watch \"./build/quicktest.js\"",
     "service:watch:mocha:server": "nodemon --ext js --watch ./build/ --exec 'mocha --timeout 20000 ./build/mocha.js || true'"
-  },
-  "engines": {
-    "node": "^14.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.0.0",
