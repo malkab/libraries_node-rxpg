@@ -1,3 +1,5 @@
+**THIS PACKAGE IS DEPRECATED AND IT'S ONLY BEING USED AT SUNNSAAS**
+
 This is a Rx PostgreSQL driver.
 
 There are several **tmuxinator** profiles:
