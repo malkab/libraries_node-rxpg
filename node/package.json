@@ -1,8 +1,8 @@
 {
-  "name": "@malkab/rxpg",
-  "version": "4.1.26",
+  "name": "@sunntics/rxpg",
+  "version": "4.1.29",
   "description": "A RxJS PostgreSQL interface.",
-  "scope": "@malkab",
+  "scope": "@sunntics",
   "author": {
     "name": "Juan Pedro Perez Alcantara",
     "email": "jp.perez.alcantara@gmail.com",
@@ -33,9 +33,6 @@
     "service:watch:quick-test:server": "nodemon --inspect=0.0.0.0:9329 \"./build/quicktest.js\" --watch \"./build/quicktest.js\"",
     "service:watch:mocha:server": "nodemon --ext js --watch ./build/ --exec 'mocha --timeout 20000 ./build/mocha.js || true'"
   },
-  "engines": {
-    "node": "^12.0.0"
-  },
   "devDependencies": {
     "@types/chai": "^4.2.14",
     "@types/lodash": "^4.14.165",
@@ -60,7 +57,7 @@
     "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
-    "@malkab/ts-utils": "^4.1.11",
+    "@sunntics/ts-utils": "4.1.18",
     "lodash": "^4.17.20",
     "pg": "^8.5.1",
     "pg-native": "^3.0.0",

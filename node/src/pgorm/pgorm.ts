@@ -1,4 +1,4 @@
-import { OrmError } from "@malkab/ts-utils";
+import { OrmError } from "@sunntics/ts-utils";
 
 import * as rx from "rxjs";
 
