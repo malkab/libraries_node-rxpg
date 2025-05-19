@@ -1,8 +1,8 @@
 {
-  "name": "@malkab/rxpg",
-  "version": "5.0.3",
+  "name": "@sunntics/rxpg",
+  "version": "5.0.4",
   "description": "A RxJS PostgreSQL interface.",
-  "scope": "@malkab",
+  "scope": "@sunntics",
   "author": {
     "name": "Juan Pedro Perez Alcantara",
     "email": "jp.perez.alcantara@gmail.com",
@@ -58,7 +58,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "@malkab/ts-utils": "^4.1.0",
+    "@sunntics/ts-utils": "4.1.18",
     "lodash": "^4.17.20",
     "pg": "^8.5.1",
     "pg-native": "^3.0.0",
