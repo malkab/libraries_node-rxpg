@@ -306,7 +306,7 @@ export class RxPg {
    * Return the number of clients connected to the database.
    *
    */
-  public getNumberClients$(): rx.Observable<number> {
+  public getNumberClients$(): rx.Observable<number | null> {
 
     return this.executeParamQuery$(`
       select

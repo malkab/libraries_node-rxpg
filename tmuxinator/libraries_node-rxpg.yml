@@ -5,18 +5,15 @@ windows:
   - rxpg/docker-dev: >
       clear ;
       sleep 2 ;
-      cd docker ;
-      . mlkcontext common ;
-      ./020_docker_node_interactive.sh
+      cd docker
+
   - docker-psql: >
       clear ;
       sleep 5 ;
-      cd docker ;
-      . mlkcontext common ;
-      ./100_docker_postgis_psql.sh
-  - docker-pg: >
+      cd docker
+
+  - docker-pg-compose: >
       clear ;
       sleep 0.5 ;
       cd docker ;
-      . mlkcontext common ;
       ./010_compose_up.sh
