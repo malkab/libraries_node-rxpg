@@ -1,6 +1,6 @@
 import * as rx from "rxjs";
 
-import { RxPg } from "../../lib/index";
+import { RxPg } from "../../src/index";
 
 /**
  *

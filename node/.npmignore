@@ -3,6 +3,7 @@ node_modules
 dist/main.d.ts
 dist/mocha.d.ts
 dist/test.d.ts
+test
 typedoc
 src
 build-library.sh

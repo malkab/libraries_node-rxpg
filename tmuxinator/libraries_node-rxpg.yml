@@ -1,0 +1,19 @@
+name: rxpg
+root: /home/git/libraries_node/libraries_node-rxpg
+
+windows:
+  - rxpg/docker-dev: >
+      clear ;
+      sleep 2 ;
+      cd docker
+
+  - docker-psql: >
+      clear ;
+      sleep 5 ;
+      cd docker
+
+  - docker-pg-compose: >
+      clear ;
+      sleep 0.5 ;
+      cd docker ;
+      ./010_compose_up.sh

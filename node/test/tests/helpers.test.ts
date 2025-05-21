@@ -1,12 +1,8 @@
 import "mocha";
 
-import { helpers as h } from "../../lib/index";
+import { Helpers as h } from "../../src/index";
 
 import { expect } from "chai";
-
-
-
-
 
 describe("helpers module", function() {
 

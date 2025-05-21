@@ -1,18 +1,10 @@
 {
 
-    "src": [
-        "../src/lib"
+    "entryPoints": [
+        "../src/"
     ],
 
-    "name": "XXX",
-    "inlineSourceMap": true,
-    "includeDeclarations": true,
-    "ignoreCompilerErrors": true,
-    "mode": "file",
-    "excludeExternals": true,
-    "excludeNotExported": true,
-    "excludeProtected": true,
-    "excludePrivate": true,
+    "name": "RxPg",
     "readme": "./markdown/MAINPAGE.md"
-    
+
 }
