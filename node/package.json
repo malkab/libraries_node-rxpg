@@ -1,6 +1,6 @@
 {
   "name": "@sunntics/rxpg",
-  "version": "5.0.8",
+  "version": "5.0.9",
   "description": "A RxJS PostgreSQL interface.",
   "scope": "@sunntics",
   "author": {
@@ -55,7 +55,7 @@
     "webpack-node-externals": "3.0.0"
   },
   "dependencies": {
-    "@sunntics/ts-utils": "8.0.10",
+    "@sunntics/ts-utils": "8.0.12",
     "lodash": "4.17.21",
     "pg": "8.16.0",
     "pg-native": "3.5.0",
