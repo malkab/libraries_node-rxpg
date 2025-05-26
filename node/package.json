@@ -1,6 +1,6 @@
 {
   "name": "@sunntics/rxpg",
-  "version": "5.0.6",
+  "version": "5.0.7",
   "description": "A RxJS PostgreSQL interface.",
   "scope": "@sunntics",
   "author": {
@@ -22,9 +22,10 @@
   },
   "private": false,
   "scripts": {
-    "build-prod": "NODE_ENV=production yarn build",
+    "build-prod": "yarn clean ; NODE_ENV=production yarn build",
     "build": "yarn clean ; yarn service:build-lib",
     "clean": "rm -Rf build ; rm -Rf dist",
+    "install_peer_dep": "npm install --no-save rxjs@7.8.1 @sunntics/ts-utils@8.0.10 pg-native@3.5.0 pg@8.16.0",
     "publish-prod": "yarn publish --patch --no-git-tag-version",
     "quick-test": "npm-run-all --parallel service:watch:quick-test:server service:build",
     "service:build-lib": "webpack --config webpack-production.config.js --progress",
@@ -54,8 +55,10 @@
     "webpack-node-externals": "3.0.0"
   },
   "dependencies": {
-    "@sunntics/ts-utils": "8.0.9",
-    "lodash": "4.17.21",
+    "lodash": "4.17.21"
+  },
+  "peerDependencies": {
+    "@sunntics/ts-utils": "8.0.10",
     "pg": "8.16.0",
     "pg-native": "3.5.0",
     "rxjs": "7.8.1"
